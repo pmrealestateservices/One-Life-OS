@@ -1,0 +1,1981 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ONE LIFE OS</title>
+<meta name="description" content="Personal growth, performance and life management.">
+<meta name="theme-color" content="#16233F" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1424" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="One Life">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>
+/* Layout: single column phone canvas (max 560px), sticky header, fixed 5-tab bar, bottom sheets for every edit. */
+:root{
+  --navy:#16233F; --navy-2:#22345A; --gold:#A8874E; --gold-soft:#E9DEC8;
+  --bg:#F8F5EF; --surface:#FFFFFF; --surface-2:#F1ECE3; --line:#E3DCCF;
+  --ink:#24262B; --ink-2:#5B5F68; --ink-3:#8A8E96;
+  --ok:#3E7D5A; --warn:#B07A2A; --bad:#A6473F; --on-accent:#FFFFFF;
+  --p-faith:#A8874E; --p-pro:#3B5D93; --p-biz:#2F7A72; --p-comms:#7A5A92; --p-health:#5E8A4E; --p-skills:#B5654A;
+  --heat-0:#ECE6DA; --heat-1:#D9C9A6; --heat-2:#C3A66E; --heat-3:#9C7B3F; --heat-rest:#D7DEE8;
+  --shadow:0 1px 2px rgba(22,35,63,.06),0 4px 14px rgba(22,35,63,.06);
+  --serif: ui-serif,"New York","Iowan Old Style",Georgia,"Times New Roman",serif;
+  --sans: -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono: ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --r:16px; --r-sm:10px;
+  --tabbar-h:64px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --navy:#C9D4EA; --navy-2:#9FB0D2; --gold:#CDAE72; --gold-soft:#3A3322;
+  --bg:#0E1424; --surface:#161F35; --surface-2:#1D2842; --line:#2A3654;
+  --ink:#ECE8E0; --ink-2:#B3B6BF; --ink-3:#848A99; --on-accent:#0E1424;
+  --ok:#6DBF8E; --warn:#E0A852; --bad:#E07B70;
+  --p-faith:#CDAE72; --p-pro:#7FA3E0; --p-biz:#5FB8AC; --p-comms:#B497D0; --p-health:#8FC07C; --p-skills:#E39478;
+  --heat-0:#1F2A44; --heat-1:#4A4430; --heat-2:#80693A; --heat-3:#CDAE72; --heat-rest:#2B3A5C;
+  --shadow:0 1px 2px rgba(0,0,0,.3);
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --navy:#C9D4EA; --navy-2:#9FB0D2; --gold:#CDAE72; --gold-soft:#3A3322;
+  --bg:#0E1424; --surface:#161F35; --surface-2:#1D2842; --line:#2A3654;
+  --ink:#ECE8E0; --ink-2:#B3B6BF; --ink-3:#848A99; --on-accent:#0E1424;
+  --ok:#6DBF8E; --warn:#E0A852; --bad:#E07B70;
+  --p-faith:#CDAE72; --p-pro:#7FA3E0; --p-biz:#5FB8AC; --p-comms:#B497D0; --p-health:#8FC07C; --p-skills:#E39478;
+  --heat-0:#1F2A44; --heat-1:#4A4430; --heat-2:#80693A; --heat-3:#CDAE72; --heat-rest:#2B3A5C;
+  --shadow:0 1px 2px rgba(0,0,0,.3);
+  color-scheme:dark;
+}
+[hidden]{display:none!important}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.45;-webkit-text-size-adjust:100%}
+body{min-height:100vh;overscroll-behavior-y:none}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+h1,h2,h3{font-family:var(--serif);font-weight:600;letter-spacing:-.01em;margin:0;text-wrap:balance;color:var(--navy)}
+h1{font-size:1.75rem;line-height:1.15}
+h2{font-size:1.25rem}
+h3{font-size:1.05rem}
+p{margin:0}
+.num{font-variant-numeric:tabular-nums}
+.muted{color:var(--ink-2)}
+.faint{color:var(--ink-3)}
+.small{font-size:.85rem}
+.tiny{font-size:.75rem}
+.eyebrow{font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+
+#app{max-width:560px;margin:0 auto;padding:0 16px calc(var(--tabbar-h) + env(safe-area-inset-bottom,0px) + 32px);min-height:100vh}
+.topbar{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(env(safe-area-inset-top,0px) + 10px) 0 10px;display:flex;align-items:center;gap:12px;justify-content:space-between}
+.topbar .title{font-family:var(--serif);font-size:1.15rem;font-weight:600;color:var(--navy)}
+.save-dot{font-size:.72rem;color:var(--ink-3);display:flex;align-items:center;gap:6px}
+.save-dot i{width:6px;height:6px;border-radius:50%;background:var(--ok);display:inline-block}
+.save-dot.pending i{background:var(--warn)}
+
+.stack{display:flex;flex-direction:column;gap:14px}
+.stack-sm{display:flex;flex-direction:column;gap:8px}
+.row{display:flex;align-items:center;gap:10px}
+.row.wrap{flex-wrap:wrap}
+.between{justify-content:space-between}
+.grow{flex:1;min-width:0}
+.section{display:flex;flex-direction:column;gap:10px;margin-top:22px}
+.section-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;box-shadow:var(--shadow)}
+.card.flat{box-shadow:none}
+.card.tight{padding:12px}
+.card.gold{border-color:var(--gold);background:linear-gradient(0deg,var(--surface),var(--surface)) padding-box}
+.list{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.list>*+*{border-top:1px solid var(--line)}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-weight:600;font-size:.95rem;color:var(--navy)}
+.btn.primary{background:var(--navy);border-color:var(--navy);color:var(--bg)}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:var(--on-accent)}
+.btn.ghost{background:transparent;border-color:transparent}
+.btn.danger{color:var(--bad)}
+.btn.block{width:100%}
+.btn.sm{min-height:36px;padding:6px 12px;font-size:.85rem;border-radius:10px}
+.btn:disabled{opacity:.5}
+.icon-btn{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:inline-flex;align-items:center;justify-content:center;color:var(--navy);flex:none}
+.icon-btn svg,.btn svg{width:20px;height:20px}
+.link{background:none;border:0;padding:6px 0;color:var(--gold);font-weight:600;font-size:.9rem;min-height:36px}
+
+/* Chips */
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chips.scroll{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:0 16px}
+.chips.scroll::-webkit-scrollbar{display:none}
+.chip{flex:none;min-height:36px;padding:6px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:.88rem;font-weight:500;color:var(--ink-2)}
+.chip[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:var(--bg)}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:.7rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:999px;background:var(--surface-2);color:var(--ink-2);white-space:nowrap}
+.badge.ess{background:var(--gold-soft);color:var(--gold)}
+.badge.ok{color:var(--ok)} .badge.warn{color:var(--warn)} .badge.bad{color:var(--bad)}
+.badge.fact{background:transparent;border:1px solid var(--line)}
+.badge.self{background:transparent;border:1px dashed var(--ink-3)}
+.badge.ai{background:transparent;border:1px dotted var(--gold);color:var(--gold)}
+.dot{width:10px;height:10px;border-radius:50%;flex:none;display:inline-block}
+
+/* Task rows */
+.task{display:flex;align-items:center;gap:12px;padding:12px 14px;min-height:60px;background:var(--surface)}
+.task .tbody{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;background:none;border:0;text-align:left;padding:0}
+.task .ttl{font-weight:500;overflow-wrap:anywhere}
+.task .meta{font-size:.78rem;color:var(--ink-3);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.task.done .ttl{color:var(--ink-3);text-decoration:line-through;text-decoration-color:var(--ink-3)}
+.task.skipped .ttl{color:var(--ink-3);font-style:italic}
+.check{width:32px;height:32px;border-radius:50%;border:2px solid var(--line);background:transparent;flex:none;display:flex;align-items:center;justify-content:center;padding:0;position:relative}
+.check::before{content:"";position:absolute;inset:-8px}
+.check svg{width:18px;height:18px;opacity:0;color:var(--on-accent)}
+.done .check{background:var(--ok);border-color:var(--ok)}
+.done .check svg{opacity:1}
+.skipped .check{border-style:dashed}
+.prio-num{font-family:var(--serif);font-size:1.3rem;color:var(--gold);width:20px;text-align:center;flex:none}
+
+/* Today header */
+.hero{display:flex;gap:16px;align-items:center;margin-top:4px}
+.ring{flex:none;position:relative;width:84px;height:84px}
+.ring svg{width:84px;height:84px;transform:rotate(-90deg)}
+.ring .lbl{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
+.ring .lbl b{font-size:1.2rem;color:var(--navy)}
+.ring .lbl span{font-size:.65rem;color:var(--ink-3);letter-spacing:.06em;text-transform:uppercase}
+.focus{font-family:var(--serif);font-style:italic;color:var(--ink-2);font-size:1rem}
+.seg{display:flex;background:var(--surface-2);border-radius:12px;padding:3px;gap:3px}
+.seg button{flex:1;min-height:38px;border:0;border-radius:9px;background:transparent;font-size:.85rem;font-weight:600;color:var(--ink-2)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--navy);box-shadow:var(--shadow)}
+
+/* Timeline */
+.tl{position:relative;padding-left:62px}
+.tl-item{position:relative;padding:6px 0}
+.tl-time{position:absolute;left:-62px;top:12px;width:52px;text-align:right;font-size:.78rem;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.tl-block{border-radius:12px;padding:10px 12px;background:var(--surface-2);border-left:3px solid var(--ink-3);font-size:.9rem}
+.tl-block.fixed{background:repeating-linear-gradient(135deg,var(--surface-2),var(--surface-2) 8px,var(--bg) 8px,var(--bg) 16px)}
+
+/* Forms */
+label.f{display:flex;flex-direction:column;gap:6px;font-size:.85rem;color:var(--ink-2);font-weight:500}
+input[type=text],input[type=number],input[type=date],input[type=time],input[type=password],input[type=url],select,textarea{width:100%;min-height:46px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-size:16px;color:var(--ink)}
+textarea{min-height:88px;resize:vertical;line-height:1.45}
+input[type=range]{width:100%;accent-color:var(--gold);height:32px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px}
+.switch{appearance:none;-webkit-appearance:none;width:50px;height:30px;border-radius:999px;background:var(--line);position:relative;flex:none;border:0;transition:background .2s}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
+.switch:checked{background:var(--ok)}
+.switch:checked::after{transform:translateX(20px)}
+.mic-wrap{position:relative}
+.mic-wrap textarea{padding-right:52px}
+.mic{position:absolute;right:6px;top:6px;width:40px;height:40px;border-radius:10px;border:0;background:var(--surface-2);color:var(--ink-2);display:flex;align-items:center;justify-content:center}
+.mic.on{background:var(--bad);color:#fff}
+.mic svg{width:18px;height:18px}
+.scale{display:flex;gap:6px}
+.scale button{flex:1;min-height:44px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-weight:600;color:var(--ink-2)}
+.scale button[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:var(--on-accent)}
+
+/* Progress bars */
+.bar{height:8px;border-radius:999px;background:var(--surface-2);overflow:hidden}
+.bar>i{display:block;height:100%;border-radius:999px;background:var(--gold)}
+.goal-card{display:flex;flex-direction:column;gap:8px;padding:14px;background:var(--surface);border:0;text-align:left;width:100%}
+
+/* Tab bar */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:10;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabbar nav{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);height:var(--tabbar-h)}
+.tabbar button{border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:.68rem;font-weight:600;color:var(--ink-3);letter-spacing:.02em}
+.tabbar button svg{width:24px;height:24px}
+.tabbar button[aria-current="page"]{color:var(--navy)}
+.tabbar button[aria-current="page"] svg{color:var(--gold)}
+.fab{position:fixed;right:max(16px,calc(50vw - 264px));bottom:calc(var(--tabbar-h) + env(safe-area-inset-bottom,0px) + 16px);z-index:9;width:56px;height:56px;border-radius:18px;border:0;background:var(--navy);color:var(--bg);box-shadow:0 6px 20px rgba(22,35,63,.28);display:flex;align-items:center;justify-content:center}
+.fab svg{width:26px;height:26px}
+
+/* Sheet */
+.scrim{position:fixed;inset:0;z-index:30;background:rgba(10,14,25,.45);display:flex;align-items:flex-end;justify-content:center;animation:fade .18s ease}
+.sheet{width:100%;max-width:560px;max-height:92vh;overflow:auto;background:var(--bg);border-radius:22px 22px 0 0;padding:8px 16px calc(24px + env(safe-area-inset-bottom,0px));animation:up .22s cubic-bezier(.2,.8,.2,1)}
+.sheet .grab{width:40px;height:5px;border-radius:3px;background:var(--line);margin:4px auto 12px}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+@keyframes up{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--tabbar-h) + env(safe-area-inset-bottom,0px) + 84px);z-index:40;background:var(--navy);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:.9rem;font-weight:500;box-shadow:var(--shadow);max-width:calc(100vw - 32px);display:flex;gap:12px;align-items:center}
+.toast button{background:none;border:0;color:var(--gold-soft);font-weight:700;padding:4px}
+
+/* Empty state */
+.empty{padding:22px 16px;text-align:center;color:var(--ink-3);font-size:.9rem;display:flex;flex-direction:column;align-items:center;gap:6px}
+.empty b{color:var(--ink-2);font-weight:600}
+
+/* Charts */
+.chart-card{display:flex;flex-direction:column;gap:10px}
+.chart-card .what{font-size:.8rem;color:var(--ink-3)}
+.chart-wrap{overflow-x:auto}
+.chart svg{display:block;width:100%;height:auto}
+.chart text{fill:var(--ink-3);font-size:10px;font-family:var(--sans)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.78rem;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px}
+.kpi b{display:block;font-family:var(--serif);font-size:1.4rem;color:var(--navy);font-variant-numeric:tabular-nums}
+.kpi span{font-size:.72rem;color:var(--ink-3)}
+.heat{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,1fr);gap:3px}
+.heat i{width:12px;height:12px;border-radius:3px;background:var(--heat-0);display:block}
+
+/* Menu list */
+.menu-item{display:flex;align-items:center;gap:14px;padding:14px;min-height:60px;background:var(--surface);border:0;width:100%;text-align:left}
+.menu-item .mi-ic{width:36px;height:36px;border-radius:10px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;color:var(--gold);flex:none}
+.menu-item .mi-ic svg{width:20px;height:20px}
+.menu-item .chev{color:var(--ink-3);width:18px;height:18px}
+
+/* Lock & onboarding */
+.lock{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:24px}
+.pin-dots{display:flex;gap:14px}
+.pin-dots i{width:14px;height:14px;border-radius:50%;border:2px solid var(--navy);display:block}
+.pin-dots i.f{background:var(--navy)}
+.keypad{display:grid;grid-template-columns:repeat(3,72px);gap:14px}
+.keypad button{width:72px;height:72px;border-radius:50%;border:1px solid var(--line);background:var(--surface);font-size:1.5rem;font-weight:500;color:var(--navy)}
+.ob{padding-top:calc(env(safe-area-inset-top,0px) + 28px)}
+.steps{display:flex;gap:6px}
+.steps i{flex:1;height:4px;border-radius:2px;background:var(--line)}
+.steps i.on{background:var(--gold)}
+.wordmark{font-family:var(--serif);letter-spacing:.18em;text-transform:uppercase;font-size:.8rem;color:var(--gold);font-weight:600}
+.callout{border:1px dashed var(--line);border-radius:12px;padding:12px;font-size:.85rem;color:var(--ink-2)}
+.pre{font-family:var(--mono);font-size:.78rem;white-space:pre-wrap;overflow-wrap:anywhere}
+hr.sep{border:0;border-top:1px solid var(--line);margin:4px 0}
+details summary{cursor:pointer;min-height:40px;display:flex;align-items:center;font-weight:600;color:var(--navy)}
+
+</style>
+</head>
+<body>
+<noscript>ONE LIFE OS needs JavaScript.</noscript>
+<script>
+'use strict';
+/* ===================== Utilities ===================== */
+const APP_VERSION = '1.0.0';
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = (p = '') => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const pad = n => String(n).padStart(2, '0');
+const ds = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const pd = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const today = () => ds(new Date());
+const addDays = (s, n) => { const d = pd(s); d.setDate(d.getDate() + n); return ds(d); };
+const addMonths = (s, n) => { const d = pd(s); const day = d.getDate(); d.setDate(1); d.setMonth(d.getMonth() + n); const last = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate(); d.setDate(Math.min(day, last)); return ds(d); };
+const dow = s => pd(s).getDay(); // 0 Sun
+const weekStart = s => addDays(s, -((dow(s) + 6) % 7)); // Monday
+const monthKey = s => s.slice(0, 7);
+const daysBetween = (a, b) => Math.round((pd(b) - pd(a)) / 864e5);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const DOWL = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const MONL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const fmtDate = (s, o = {}) => { const d = pd(s); return `${o.dow ? DOW[d.getDay()] + ' ' : ''}${d.getDate()} ${MON[d.getMonth()]}${o.year ? ' ' + d.getFullYear() : ''}`; };
+const fmtLong = s => { const d = pd(s); return `${DOWL[d.getDay()]} ${d.getDate()} ${MONL[d.getMonth()]}`; };
+const fmtMonth = k => { const [y, m] = k.split('-').map(Number); return `${MONL[m - 1]} ${y}`; };
+const toMin = t => { if (!t) return null; const [h, m] = t.split(':').map(Number); return h * 60 + m; };
+const fromMin = m => `${pad(Math.floor(((m % 1440) + 1440) % 1440 / 60))}:${pad(((m % 60) + 60) % 60)}`;
+const nowIso = () => new Date().toISOString();
+const money = v => (v == null || v === '' || isNaN(v)) ? '—' : '£' + Number(v).toLocaleString('en-GB', { maximumFractionDigits: 0 });
+const pct = (a, b) => b ? Math.round(a / b * 100) : null;
+const sum = a => a.reduce((x, y) => x + (Number(y) || 0), 0);
+
+/* ===================== Icons (inline SVG, stroke) ===================== */
+const I = (p, extra = '') => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ${extra}>${p}</svg>`;
+const ICON = {
+  today: I('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'),
+  goals: I('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/>'),
+  progress: I('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'),
+  journal: I('<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11M9 8h6"/>'),
+  more: I('<circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/>'),
+  plus: I('<path d="M12 5v14M5 12h14"/>'),
+  check: I('<path d="M5 12.5l4.5 4.5L19 7.5"/>', 'stroke-width="2.6"'),
+  chev: I('<path d="M9 6l6 6-6 6"/>'),
+  back: I('<path d="M15 6l-6 6 6 6"/>'),
+  close: I('<path d="M6 6l12 12M18 6L6 18"/>'),
+  mic: I('<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>'),
+  moon: I('<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>'),
+  sun: I('<circle cx="12" cy="12" r="4"/><path d="M12 3v1M12 20v1M3 12h1M20 12h1"/>'),
+  cal: I('<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>'),
+  brief: I('<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18"/>'),
+  home: I('<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>'),
+  pound: I('<path d="M17 20H7c2-1.5 2.5-4 2-7M6 13h8M15 7.5A3.5 3.5 0 0 0 8.5 6C8 8 9 11 9 13"/>'),
+  log: I('<path d="M4 6h16M4 12h10M4 18h7"/><circle cx="18" cy="17" r="3"/>'),
+  repeat: I('<path d="M17 2l3 3-3 3"/><path d="M4 11V9a4 4 0 0 1 4-4h12M7 22l-3-3 3-3"/><path d="M20 13v2a4 4 0 0 1-4 4H4"/>'),
+  gear: I('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>'),
+  cloud: I('<path d="M7 18a5 5 0 1 1 1.6-9.7A6 6 0 0 1 20 11a4 4 0 0 1-1 7z"/><path d="M12 12v6M9.5 14.5L12 12l2.5 2.5"/>'),
+  download: I('<path d="M12 3v12M7 10l5 5 5-5M4 21h16"/>'),
+  phone: I('<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>'),
+  star: I('<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>'),
+  edit: I('<path d="M4 20h4L19 9l-4-4L4 16z"/>'),
+  trash: I('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>'),
+  skip: I('<path d="M5 5l9 7-9 7zM18 5v14"/>'),
+  people: I('<circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.5a5 5 0 0 1 5.5 5"/>'),
+  lock: I('<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>'),
+  music: I('<path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>'),
+  book: I('<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/>'),
+};
+
+/* ===================== Pillars ===================== */
+const PILLARS = [
+  { id: 'faith', name: 'Faith, Marriage & Service', short: 'Faith & Family', color: 'var(--p-faith)' },
+  { id: 'pro', name: 'Professional Excellence — DVS', short: 'Professional', color: 'var(--p-pro)' },
+  { id: 'biz', name: 'Business, Property & Wealth', short: 'Business', color: 'var(--p-biz)' },
+  { id: 'comms', name: 'Communication & Leadership', short: 'Communication', color: 'var(--p-comms)' },
+  { id: 'health', name: 'Health & Performance', short: 'Health', color: 'var(--p-health)' },
+  { id: 'skills', name: 'Skills & Creative Development', short: 'Skills', color: 'var(--p-skills)' },
+];
+const P = Object.fromEntries(PILLARS.map(p => [p.id, p]));
+const pillarDot = id => `<span class="dot" style="background:${P[id]?.color || 'var(--ink-3)'}"></span>`;
+
+const WORKSPACES = [
+  { id: 'pmres', name: 'PMRes', blurb: 'Consultancy, investor services, acquisitions, development, refurbishment, disposals' },
+  { id: 'pio', name: 'Property Is One', blurb: 'Education, content, audience development, knowledge sharing' },
+  { id: 'origin', name: 'Origin Property', blurb: 'Potential joint venture with a business partner' },
+  { id: 'ghana', name: 'Ghana portfolio', blurb: 'Family assets, four-apartment development, future opportunities' },
+];
+const GOAL_STATUS = { notstarted: ['Not started', ''], ontrack: ['On track', 'ok'], atrisk: ['At risk', 'warn'], offtrack: ['Needs attention', 'bad'], paused: ['Paused', ''], done: ['Achieved', 'ok'] };
+
+/* ===================== Persistent store (IndexedDB) ===================== */
+const COLLECTIONS = ['settings', 'goals', 'milestones', 'routines', 'tasks', 'days', 'journal', 'competencies', 'projects', 'finance', 'logs', 'reviews', 'events', 'sync'];
+const S = {}; // in-memory state, one entry per collection
+const IDB = {
+  db: null,
+  open() {
+    return new Promise((res, rej) => {
+      if (!('indexedDB' in window)) return rej(new Error('IndexedDB unavailable'));
+      const r = indexedDB.open('one-life-os', 1);
+      r.onupgradeneeded = () => r.result.createObjectStore('kv');
+      r.onsuccess = () => { this.db = r.result; res(); };
+      r.onerror = () => rej(r.error);
+    });
+  },
+  get(k) { return new Promise((res, rej) => { const t = this.db.transaction('kv').objectStore('kv').get(k); t.onsuccess = () => res(t.result); t.onerror = () => rej(t.error); }); },
+  put(k, v) { return new Promise((res, rej) => { const tx = this.db.transaction('kv', 'readwrite'); tx.objectStore('kv').put(v, k); tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); }); },
+};
+let memoryOnly = false;
+const dirty = new Set();
+let saveTimer = null;
+function defaults(k) {
+  return ({ settings: {}, days: {}, journal: {}, finance: { targets: [], entries: [] }, sync: { map: {}, deleted: [] } })[k] ?? [];
+}
+async function loadAll() {
+  try { await IDB.open(); } catch (e) { memoryOnly = true; }
+  for (const k of COLLECTIONS) {
+    let v = null;
+    if (!memoryOnly) { try { v = await IDB.get(k); } catch (e) { v = null; } }
+    S[k] = v ?? defaults(k);
+  }
+}
+function save(...keys) {
+  keys.forEach(k => dirty.add(k));
+  setSaveDot(true);
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(flush, 250);
+}
+async function flush() {
+  const keys = [...dirty]; dirty.clear();
+  if (memoryOnly) { setSaveDot(false, 'Not saved — storage blocked'); return; }
+  try {
+    for (const k of keys) await IDB.put(k, JSON.parse(JSON.stringify(S[k])));
+    setSaveDot(false);
+  } catch (e) { keys.forEach(k => dirty.add(k)); setSaveDot(false, 'Save failed — retrying'); setTimeout(flush, 2000); }
+}
+window.addEventListener('pagehide', () => { if (dirty.size) flush(); });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && dirty.size) flush(); });
+function setSaveDot(pending, msg) {
+  const el = $('#saveDot'); if (!el) return;
+  el.classList.toggle('pending', !!pending);
+  el.querySelector('span').textContent = msg || (pending ? 'Saving' : 'Saved');
+}
+const touch = r => { r.updatedAt = nowIso(); return r; };
+
+/* ===================== Year cycle & quarters ===================== */
+const PHASES = [
+  { q: 1, name: 'Foundations and consistency' },
+  { q: 2, name: 'Professional development and validated business launch activity' },
+  { q: 3, name: 'Execution, measurable progress and financial capacity' },
+  { q: 4, name: 'Consolidation, evaluation and preparation for future scaling' },
+];
+const yearStart = () => S.settings.yearStart || '2026-10-14';
+function cycleFor(date) { // returns {start, end, label, n}
+  const base = yearStart();
+  let n = 0; let start = base;
+  if (date < base) { while (date < start) { n--; start = addMonths(base, 12 * n); } }
+  else { while (addMonths(base, 12 * (n + 1)) <= date) n++; start = addMonths(base, 12 * n); }
+  const end = addDays(addMonths(start, 12), -1);
+  return { start, end, n, label: `${pd(start).getFullYear()}–${String(pd(end).getFullYear()).slice(2)}` };
+}
+function quarterOf(date) {
+  const c = cycleFor(date);
+  for (let q = 1; q <= 4; q++) {
+    const s = addMonths(c.start, (q - 1) * 3), e = addDays(addMonths(c.start, q * 3), -1);
+    if (date >= s && date <= e) return { q, start: s, end: e, cycle: c, phase: PHASES[q - 1].name };
+  }
+  return { q: 4, start: c.start, end: c.end, cycle: c, phase: PHASES[3].name };
+}
+function quarterRange(cycleStart, q) { return { start: addMonths(cycleStart, (q - 1) * 3), end: addDays(addMonths(cycleStart, q * 3), -1) }; }
+
+function phaseLabel(date) {
+  if (date < yearStart()) return `Year one starts ${fmtDate(yearStart(), { dow: true })} · Q1 ${PHASES[0].name}`;
+  const q = quarterOf(date); return `Q${q.q} · ${q.phase}`;
+}
+
+/* ===================== Starter content (editable, no invented achievements) ===================== */
+const STARTER_GOALS = [
+  { key: 'faith-rhythm', pillar: 'faith', on: true, title: 'Keep a steady daily rhythm of Scripture and prayer', why: 'Keeps my life anchored in Christ before anything else.', criteria: 'A morning rhythm I keep on most days, and a reading plan completed or progressing. Tracked as a rhythm, never scored.', m: [['Choose a reading plan and fix a morning time', 'Start a simple prayer list'], ['Add a short weekly reflection on what I am learning'], ['Complete a focused study of one book'], ['Look back on the year and set next year\'s plan']] },
+  { key: 'marriage', pillar: 'faith', on: true, title: 'Protect and invest in my marriage', why: 'My wife comes before every project.', criteria: 'Weekly date night kept or moved, never dropped. Daily unhurried time together. A shared plan for the year.', m: [['Agree our date-night rhythm together'], ['Plan a getaway together'], ['Talk through shared goals and finances'], ['Celebrate and review the year together']] },
+  { key: 'serve', pillar: 'faith', on: true, title: 'Serve faithfully in Bible study, youth and worship', why: 'Serving well needs preparation, not leftovers.', criteria: 'Every Bible study prepared at least a day ahead. Youth sessions planned monthly. New songs ready before Sunday.', m: [['Fix a weekly preparation slot'], ['Plan a youth teaching series'], ['Mentor someone to share leading'], ['Review the year with church leaders']] },
+  { key: 'health-ws', pillar: 'pro', on: true, title: 'Build working mastery of the DVS Health workstream', why: 'Deep sector knowledge makes me the valuer people rely on.', criteria: 'Self-rated 4/5 or above on core Health competencies. Non-confidential learning notes logged every month.', m: [['Map the main Health property types and valuation approaches', 'Set my competency baseline'], ['Study DRC and specialised property methodology in depth'], ['Lead cases with less supervision, as agreed with my line manager'], ['Run a learning session for colleagues']] },
+  { key: 'cpd', pillar: 'pro', on: true, title: 'Meet and exceed RICS CPD requirements', why: 'Keeps my practice current and my membership in good standing.', criteria: 'At least 20 hours CPD, of which at least 10 formal, logged with evidence. Check current RICS rules each year.', m: [['Set a CPD plan and log the first 5 hours'], ['Reach 10 hours logged'], ['Reach 15 hours logged'], ['Complete and record 20+ hours']] },
+  { key: 'senior', pillar: 'pro', on: false, title: 'Map my route to Principal Surveyor and FRICS', why: 'Long-term ambition needs a visible path.', criteria: 'A written 3-year development plan with evidence gathered against senior-role and FRICS criteria.', m: [['Read the FRICS and senior-role criteria'], ['Draft the 3-year plan with my line manager'], ['Gather evidence against two criteria'], ['Review the plan and update it']] },
+  { key: 'pmres', pillar: 'biz', on: true, title: 'Validate PMRes with approved first clients', why: 'Proves the consultancy before I scale it.', criteria: 'Outside-employment approval confirmed. One core offer defined and priced. First paid engagements completed.', ws: 'pmres', m: [['Confirm outside-employment approval and conflict rules', 'Define one core service and its pricing'], ['Launch a simple website and outreach'], ['Complete first engagements and gather feedback'], ['Review the numbers and decide the scale-up plan']] },
+  { key: 'pio', pillar: 'biz', on: true, title: 'Grow Property Is One consistently', why: 'Teaching builds trust, audience and future products.', criteria: 'A weekly publishing rhythm kept. Free guide launched.', ws: 'pio', m: [['Set a sustainable posting rhythm'], ['Launch the free guide'], ['Publish the ebook'], ['Review audience growth and plan products']] },
+  { key: 'origin', pillar: 'biz', on: true, title: 'Decide on Origin Property with clear terms', why: 'A partnership needs clarity before commitment.', criteria: 'Go or no-go decided, backed by written heads of terms and professional advice.', ws: 'origin', m: [['Agree goals and roles with my partner'], ['Complete due diligence and take legal advice'], ['Make the go or no-go decision'], ['If go: reach the first project milestone']] },
+  { key: 'ghana', pillar: 'biz', on: true, title: 'Move the Ghana four-apartment development forward', why: 'Family assets and a base for future growth.', criteria: 'Budget, programme and monitoring in place. Agreed construction stage reached.', ws: 'ghana', m: [['Confirm budget, cost plan and who decides what'], ['Agree contractor terms and payment schedule'], ['Reach the agreed construction stage'], ['Plan the letting or sale strategy']] },
+  { key: 'capital', pillar: 'biz', on: true, title: 'Build financial capacity for property development', why: 'Capital and low debt give me options.', criteria: 'Savings, debt and capital targets set in Finance and updated monthly.', m: [['Set savings, debt and capital targets'], ['Automate monthly saving'], ['Review progress against targets'], ['Assess development readiness']] },
+  { key: 'comms', pillar: 'comms', on: true, title: 'Communicate with clarity and calm confidence', why: 'Clear communication multiplies technical skill.', criteria: 'Drills most weeks, a rising self-rated clarity trend, and two presentations delivered.', m: [['Start a 10-minute drill habit'], ['Deliver one internal presentation'], ['Lead a stakeholder meeting confidently'], ['Give a talk to a wider audience']] },
+  { key: 'health', pillar: 'health', on: true, title: 'Train consistently and protect sleep', why: 'Energy underpins everything else.', criteria: 'Three sessions in most weeks. In bed by bedtime on most nights.', m: [['Settle a three-session weekly routine'], ['Set a fitness benchmark'], ['Improve on the benchmark'], ['Review and plan next year']] },
+  { key: 'keys', pillar: 'skills', on: true, title: 'Grow as a worship keyboard player', why: 'Serve the church with skill and freedom.', criteria: 'Wider chord vocabulary, songs learned by ear logged, new songs played confidently on Sundays.', m: [['Settle a practice routine and learn core chord extensions'], ['Play songs by ear in common keys'], ['Learn transitions and reharmonisation'], ['Lead a song confidently by ear']] },
+  { key: 'trading', pillar: 'skills', on: true, title: 'Learn trading as a mastery skill, not an income stream', why: 'Understand markets with discipline before risking money.', criteria: 'One structured curriculum completed, written risk rules, and a journal of practice trades.', m: [['Pick one curriculum and a journal format'], ['Practise market structure and chart analysis'], ['Practise trades with written risk rules'], ['Evaluate: keep learning or pause']] },
+];
+
+const STARTER_COMPETENCIES = [
+  'Red Book (RICS Valuation – Global Standards) compliance', 'Health sector property knowledge', 'DRC and specialised property valuation',
+  'Investment and comparison methods', 'Development appraisal', 'Landlord and tenant', 'Inspection and measurement',
+  'Report writing', 'Negotiation', 'Stakeholder engagement', 'Coaching APC candidates',
+];
+
+const STARTER_PROJECTS = [
+  { ws: 'pmres', title: 'Validate the PMRes offer', ms: ['Outside-employment approval confirmed', 'Core service and pricing written', 'Simple website live', 'First engagement completed'] },
+  { ws: 'pio', title: 'Content system and free guide', ms: ['Posting rhythm agreed', 'Free guide drafted', 'Free guide published', 'Ebook outline'] },
+  { ws: 'origin', title: 'JV due diligence', ms: ['Goals and roles agreed', 'Heads of terms drafted', 'Legal advice taken', 'Go or no-go decision'] },
+  { ws: 'ghana', title: 'Four-apartment development', ms: ['Budget and cost plan confirmed', 'Contractor terms and payment schedule', 'Monitoring arrangements in place', 'Letting or sale strategy'] },
+];
+
+function buildRoutines(o) {
+  const wake = toMin(o.wake), bed = toMin(o.bedtime), all = [0, 1, 2, 3, 4, 5, 6];
+  const wife = o.wifeName ? o.wifeName : 'my wife';
+  const bsDay = Number(o.bibleDay), dn = Number(o.dateNight);
+  const R = (pillar, title, days, time, dur, x = {}) => ({ id: uid('r'), pillar, title, days, time, dur, essential: false, mvd: false, anchor: false, when: 'any', active: true, ...x });
+  return [
+    R('faith', 'Scripture and prayer', all, fromMin(wake + 15), 20, { essential: true, mvd: true, anchor: true }),
+    R('faith', `Unhurried time with ${wife}`, all.filter(d => d !== bsDay && d !== dn), '20:15', 30, { essential: true, mvd: true, anchor: true }),
+    R('faith', `Time together with ${wife}`, [bsDay].filter(d => d !== dn), '21:15', 20, { essential: true, mvd: true, anchor: true }),
+    R('faith', 'Date night', [dn], '19:00', 120, { essential: true, mvd: true }),
+    R('faith', 'Lead Bible study', [bsDay], o.bibleTime, 90, { essential: true, mvd: true }),
+    R('faith', 'Prepare Bible study', [(bsDay + 5) % 7], '16:00', 45, { essential: true }),
+    R('faith', 'Church service and keyboard', [0], o.churchTime, 180, { essential: true, mvd: true }),
+    R('pro', 'Professional learning (20 min)', [2, 3, 4], '18:30', 20, { kind: 'cpd' }),
+    R('pro', 'Note one thing I learned at work (non-confidential)', [1, 2, 3, 4, 5], o.workEnd, 5, { when: 'workday' }),
+    R('comms', 'Communication drill (10 min)', [1, 3, 5], fromMin(wake + 40), 10, { kind: 'comms' }),
+    R('health', 'Workout', [2, 4], '17:45', 40, { kind: 'workout' }),
+    R('health', 'Workout', [6], '08:00', 45, { kind: 'workout' }),
+    R('health', 'Lunchtime walk', [1, 2, 3, 4, 5], '12:30', 20, { when: 'remote' }),
+    R('health', 'Screens off, wind down', all, fromMin(bed - 30), 30, { essential: true, mvd: true, anchor: true }),
+    R('health', `Lights out by ${o.bedtime}`, all, o.bedtime, 0, { essential: true, mvd: true, anchor: true }),
+    R('biz', 'Business block: PMRes or Property Is One', [3], '19:00', 60),
+    R('biz', 'Business block: projects and Ghana updates', [6], '09:30', 120),
+    R('skills', 'Keyboard practice (20 min)', [2, 4], '19:15', 20, { kind: 'keyboard' }),
+    R('skills', 'Keyboard: learn Sunday songs', [6], '15:00', 30, { kind: 'keyboard' }),
+    R('skills', 'Trading study (30 min)', [6], '11:30', 30, { kind: 'trading' }),
+    R('', 'Weekly review and plan next week', [0], '19:00', 20),
+  ].filter(r => r.days.length);
+}
+
+function seedFromOnboarding(o, goalKeys) {
+  const st = S.settings;
+  Object.assign(st, {
+    name: o.name.trim() || 'Paul', wifeName: o.wifeName.trim(), wake: o.wake, bedtime: o.bedtime,
+    workStart: o.workStart, workEnd: o.workEnd, officeDays: o.officeDays, commute: Number(o.commute) || 0,
+    bibleDay: Number(o.bibleDay), bibleTime: o.bibleTime, churchTime: o.churchTime, dateNight: Number(o.dateNight),
+    yearStart: o.yearStart || '2026-10-14', theme: st.theme || 'auto', onboarded: true, createdAt: nowIso(),
+  });
+  S.routines = buildRoutines(o);
+  const cyc = cycleFor(today() < yearStart() ? yearStart() : today());
+  S.goals = []; S.milestones = [];
+  for (const g of STARTER_GOALS.filter(g => goalKeys.includes(g.key))) {
+    const id = uid('g');
+    S.goals.push(touch({ id, pillar: g.pillar, title: g.title, why: g.why, criteria: g.criteria, targetDate: cyc.end, cycle: cyc.start, status: 'notstarted', progressMode: 'auto', progress: 0, evidence: [], risks: '', deps: '', ws: g.ws || '', createdAt: nowIso() }));
+    g.m.forEach((arr, qi) => arr.forEach(t => {
+      const r = quarterRange(cyc.start, qi + 1);
+      S.milestones.push(touch({ id: uid('m'), goalId: id, kind: 'quarter', q: qi + 1, period: `Q${qi + 1}`, due: r.end, title: t, done: false }));
+    }));
+  }
+  S.competencies = STARTER_COMPETENCIES.map(n => touch({ id: uid('c'), name: n, confidence: null, history: [], evidence: [] }));
+  S.projects = STARTER_PROJECTS.map(p => touch({ id: uid('p'), ws: p.ws, title: p.title, status: 'active', next: '', notes: '', milestones: p.ms.map(t => ({ id: uid('pm'), title: t, done: false, due: '' })), decisions: [], learning: [] }));
+  save(...COLLECTIONS);
+}
+
+/* ===================== Rules-based daily planning engine ===================== */
+function defaultWorkType(date) {
+  const d = dow(date);
+  if (d === 0 || d === 6) return 'off';
+  return (S.settings.officeDays || []).includes(d) ? 'office' : 'remote';
+}
+function getDay(date, create = true) {
+  let day = S.days[date];
+  if (!day && create) { day = S.days[date] = { date, mode: 'normal', workType: defaultWorkType(date), priorities: null, focus: '', checkin: null }; save('days'); }
+  return day || { date, mode: 'normal', workType: defaultWorkType(date), priorities: null, focus: '', checkin: null };
+}
+function routineApplies(r, date, day) {
+  if (!r.active || !r.days.includes(dow(date))) return false;
+  const wt = day.workType;
+  if (r.when === 'office') return wt === 'office';
+  if (r.when === 'remote') return wt === 'remote';
+  if (r.when === 'workday') return wt === 'office' || wt === 'remote';
+  return true;
+}
+/* Generate routine tasks once per date (only for today and future dates the user actually opens — never back-filled). */
+function generateDay(date) {
+  if (date < today()) return;
+  const day = getDay(date);
+  if (day.generated) return;
+  for (const r of S.routines) {
+    if (!routineApplies(r, date, day)) continue;
+    if (S.tasks.some(t => t.routineId === r.id && t.date === date)) continue;
+    S.tasks.push(touch({ id: uid('t'), title: r.title, pillar: r.pillar, date, time: r.time, dur: r.dur, essential: r.essential, mvd: r.mvd, anchor: r.anchor, kind: r.kind || '', routineId: r.id, status: 'open', source: 'routine', createdAt: nowIso() }));
+  }
+  day.generated = true;
+  save('tasks', 'days');
+}
+/* When work type changes, re-evaluate routine tasks that depend on it (open ones only). */
+function regenerateForWorkType(date) {
+  const day = getDay(date);
+  S.tasks = S.tasks.filter(t => !(t.date === date && t.source === 'routine' && t.status === 'open' && (() => { const r = S.routines.find(x => x.id === t.routineId); return r && r.when !== 'any'; })()));
+  day.generated = false; generateDay(date);
+}
+function inMode(t, mode) {
+  if (mode === 'mvd') return t.essential || t.mvd;
+  if (mode === 'rest') return t.essential && (t.anchor || t.mvd);
+  return true;
+}
+function tasksFor(date) {
+  const day = getDay(date, false);
+  return S.tasks.filter(t => t.date === date && inMode(t, day.mode)).sort(byTime);
+}
+function byTime(a, b) { return (toMin(a.time) ?? 2000) - (toMin(b.time) ?? 2000) || (a.createdAt || '').localeCompare(b.createdAt || ''); }
+/* Counted = planned tasks visible in the day's mode, excluding intentional skips. Rest days are never penalised. */
+function dayStats(date) {
+  const ts = tasksFor(date);
+  const counted = ts.filter(t => t.status !== 'skipped');
+  const done = counted.filter(t => t.status === 'done').length;
+  return { planned: counted.length, done, skipped: ts.length - counted.length, pct: counted.length ? Math.round(done / counted.length * 100) : null, mode: getDay(date, false).mode };
+}
+function goalOf(id) { return S.goals.find(g => g.id === id); }
+function goalProgress(g) {
+  if (g.progressMode === 'manual') return g.progress || 0;
+  const ms = S.milestones.filter(m => m.goalId === g.id);
+  if (g.status === 'done') return 100;
+  return ms.length ? Math.round(ms.filter(m => m.done).length / ms.length * 100) : 0;
+}
+/* Suggest top three: goal-linked and weekly actions first, then at-risk goals, then pillars neglected in the last 7 days. */
+function suggestPriorities(date) {
+  const ts = tasksFor(date).filter(t => t.status !== 'skipped' && !t.anchor);
+  const recent = {};
+  for (let i = 1; i <= 7; i++) S.tasks.filter(t => t.date === addDays(date, -i) && t.status === 'done').forEach(t => { recent[t.pillar] = (recent[t.pillar] || 0) + 1; });
+  const score = t => {
+    let s = 0; const g = t.goalId && goalOf(t.goalId);
+    if (t.source === 'manual') s += 3;
+    if (t.source === 'weekly') s += 4;
+    if (g) s += 3 + (g.status === 'atrisk' || g.status === 'offtrack' ? 2 : 0);
+    if (t.essential && !t.anchor) s += 2;
+    if (!recent[t.pillar]) s += 1;
+    if (t.status === 'done') s -= 0.5;
+    return s;
+  };
+  const ranked = ts.map(t => [score(t), t]).sort((a, b) => b[0] - a[0]).map(x => x[1]);
+  const out = [], pillars = new Set();
+  for (const t of ranked) { if (out.length < 3 && !pillars.has(t.pillar)) { out.push(t.id); pillars.add(t.pillar); } }
+  for (const t of ranked) { if (out.length < 3 && !out.includes(t.id)) out.push(t.id); }
+  return out;
+}
+function prioritiesFor(date) {
+  const day = getDay(date, false);
+  const ids = (day.priorities || suggestPriorities(date)).filter(id => S.tasks.some(t => t.id === id));
+  return { ids: ids.slice(0, 3), custom: !!day.priorities };
+}
+function focusFor(date) {
+  const day = getDay(date, false), j = S.journal[date];
+  if (day.focus) return day.focus;
+  if (j?.morning?.matters) return j.morning.matters;
+  const q = date < yearStart() ? { q: 1 } : quarterOf(date);
+  const lines = {
+    1: ['Show up, keep it simple, build the rhythm.', 'Small faithful steps beat big bursts.', 'Consistency first. Intensity later.'],
+    2: ['Learn deeply, and test one business idea properly.', 'Grow the skill. Validate the offer.'],
+    3: ['Execute the plan. Measure what moved.', 'Progress you can show, capacity you can count.'],
+    4: ['Consolidate the gains. Prepare to scale wisely.', 'Review honestly, finish well, plan ahead.'],
+  }[q.q];
+  if (getDay(date, false).mode === 'rest') return 'Rest is part of the plan. Be present.';
+  return lines[pd(date).getDate() % lines.length];
+}
+/* Timeline: fixed blocks (work, commute, events) merged with timed tasks. */
+function scheduleFor(date) {
+  const day = getDay(date, false), st = S.settings, items = [];
+  const wt = day.workType;
+  if ((wt === 'office' || wt === 'remote') && day.mode !== 'rest') {
+    const ws = toMin(st.workStart || '09:00'), we = toMin(st.workEnd || '17:00');
+    if (wt === 'office' && st.commute) items.push({ fixed: true, time: fromMin(ws - st.commute), end: st.workStart, title: 'Commute', pillar: '' });
+    items.push({ fixed: true, time: st.workStart, end: st.workEnd, title: wt === 'office' ? 'Work — office day' : 'Work — remote day', pillar: 'pro' });
+    if (wt === 'office' && st.commute) items.push({ fixed: true, time: st.workEnd, end: fromMin(we + st.commute), title: 'Commute home', pillar: '' });
+  }
+  for (const e of S.events.filter(e => e.date === date)) items.push({ fixed: true, event: true, time: e.start || null, end: e.end, title: e.title, pillar: '' });
+  for (const t of tasksFor(date)) if (t.time) items.push({ task: t, time: t.time });
+  return items.sort((a, b) => (toMin(a.time) ?? -1) - (toMin(b.time) ?? -1));
+}
+function workConflict(t, date) {
+  const day = getDay(date, false); if (!t.time || !['office', 'remote'].includes(day.workType)) return false;
+  const m = toMin(t.time), ws = toMin(S.settings.workStart), we = toMin(S.settings.workEnd);
+  return m > ws && m < we && !(m >= 12 * 60 && m < 14 * 60) && t.pillar !== 'pro';
+}
+
+/* ===================== App shell, routing, sheets ===================== */
+const A = {};          // click actions: data-a="name"
+const ON = {};         // input/change handlers: data-on="name"
+const R = { tab: 'today', sub: null, arg: null, date: null, stack: [] };
+const TABS = [['today', 'Today'], ['goals', 'Goals'], ['progress', 'Progress'], ['journal', 'Journal'], ['more', 'More']];
+const SCREENS = {};    // name -> () => html
+
+function shell() {
+  document.body.innerHTML = `
+  <div id="app"><header class="topbar" id="topbar"></header><main id="view"></main></div>
+  <button class="fab" id="fab" data-a="quickAdd" aria-label="Add a task">${ICON.plus}</button>
+  <div class="tabbar"><nav>${TABS.map(([id, l]) => `<button data-a="tab" data-id="${id}" aria-label="${l}">${ICON[id]}<span>${l}</span></button>`).join('')}</nav></div>`;
+}
+function go(tab, sub = null, arg = null, push = false) {
+  if (push) R.stack.push({ tab: R.tab, sub: R.sub, arg: R.arg, y: scrollY }); else R.stack = [];
+  Object.assign(R, { tab, sub, arg });
+  render(); scrollTo(0, 0);
+}
+function back() { const p = R.stack.pop(); if (!p) return go(R.tab); Object.assign(R, p); render(); scrollTo(0, p.y || 0); }
+function render() {
+  if (R.tab === 'today' && !R.sub) generateDay(R.date || today());
+  const key = R.sub || R.tab;
+  const scr = SCREENS[key] || SCREENS.today;
+  const out = scr();
+  $('#topbar').innerHTML = out.top ?? topTitle(out.title || '');
+  $('#view').innerHTML = out.html;
+  $$('.tabbar button').forEach(b => b.setAttribute('aria-current', b.dataset.id === R.tab ? 'page' : 'false'));
+  $('#fab').hidden = !['today', 'goals'].includes(R.tab) || (R.sub && R.sub !== 'goal');
+  out.after && out.after();
+  setSaveDot(dirty.size > 0);
+}
+function topTitle(title, backBtn = R.stack.length > 0, right = '') {
+  return `<div class="row grow">${backBtn ? `<button class="icon-btn" data-a="back" aria-label="Back">${ICON.back}</button>` : ''}<div class="title grow" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(title)}</div></div>
+  <div class="row">${right}<div class="save-dot" id="saveDot"><i></i><span>Saved</span></div></div>`;
+}
+A.tab = el => go(el.dataset.id);
+A.back = () => back();
+
+/* Sheets */
+let sheetClose = null;
+function openSheet(title, html, opts = {}) {
+  closeSheet(true);
+  const s = document.createElement('div');
+  s.className = 'scrim'; s.id = 'scrim';
+  s.innerHTML = `<div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(title)}"><div class="grab"></div>
+    <div class="sheet-head"><h2>${esc(title)}</h2><button class="icon-btn" data-a="closeSheet" aria-label="Close">${ICON.close}</button></div>
+    <div class="stack" id="sheetBody">${html}</div></div>`;
+  s.addEventListener('click', e => { if (e.target === s) closeSheet(); });
+  document.body.appendChild(s);
+  document.body.style.overflow = 'hidden';
+  sheetClose = opts.onClose || null;
+  opts.after && opts.after($('#sheetBody'));
+}
+function closeSheet(silent) {
+  const s = $('#scrim'); if (!s) return;
+  s.remove(); document.body.style.overflow = '';
+  const cb = sheetClose; sheetClose = null; stopDictation();
+  if (!silent && cb) cb();
+}
+A.closeSheet = () => closeSheet();
+
+let toastT;
+function toast(msg, undo) {
+  $('#toast')?.remove(); clearTimeout(toastT);
+  const t = document.createElement('div'); t.className = 'toast'; t.id = 'toast'; t.setAttribute('role', 'status');
+  t.innerHTML = `<span>${esc(msg)}</span>${undo ? '<button data-a="toastUndo">Undo</button>' : ''}`;
+  document.body.appendChild(t); A.toastUndo = () => { undo && undo(); t.remove(); };
+  toastT = setTimeout(() => t.remove(), undo ? 5000 : 2600);
+}
+
+/* Delegated events (no inline handlers) */
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-a]'); if (!el) return;
+  const fn = A[el.dataset.a]; if (!fn) return;
+  e.preventDefault(); fn(el, e);
+});
+document.addEventListener('input', e => { const el = e.target.closest('[data-on]'); if (el && ON[el.dataset.on]) ON[el.dataset.on](el, e); });
+document.addEventListener('change', e => { const el = e.target.closest('[data-onchange]'); if (el && ON[el.dataset.onchange]) ON[el.dataset.onchange](el, e); });
+
+/* Small form helpers */
+const val = id => { const el = document.getElementById(id); if (!el) return ''; return el.type === 'checkbox' ? el.checked : el.value; };
+const pillarSelect = (id, sel, allowNone = true) => `<select id="${id}">${allowNone ? `<option value="" ${!sel ? 'selected' : ''}>General</option>` : ''}${PILLARS.map(p => `<option value="${p.id}" ${sel === p.id ? 'selected' : ''}>${esc(p.short)}</option>`).join('')}</select>`;
+const scaleInput = (id, v, max = 5, labels) => `<div class="scale" id="${id}" data-value="${v ?? ''}">${Array.from({ length: max }, (_, i) => `<button type="button" data-a="scalePick" data-v="${i + 1}" aria-pressed="${v === i + 1}" aria-label="${labels ? labels[i] : i + 1}">${i + 1}</button>`).join('')}</div>`;
+A.scalePick = el => { const box = el.parentElement; box.dataset.value = el.dataset.v; $$('button', box).forEach(b => b.setAttribute('aria-pressed', b === el)); box.dispatchEvent(new Event('scale', { bubbles: true })); };
+const scaleVal = id => { const v = document.getElementById(id)?.dataset.value; return v ? Number(v) : null; };
+const toggleRow = (id, label, on, hint = '') => `<label class="toggle"><span class="grow"><span>${esc(label)}</span>${hint ? `<br><span class="tiny faint">${esc(hint)}</span>` : ''}</span><input type="checkbox" class="switch" id="${id}" ${on ? 'checked' : ''}></label>`;
+const textArea = (id, value, ph = '', on = '') => `<div class="mic-wrap"><textarea id="${id}" placeholder="${esc(ph)}" ${on ? `data-on="${on}"` : ''}>${esc(value || '')}</textarea>${micBtn(id)}</div>`;
+const empty = (title, body, btn = '') => `<div class="empty"><b>${esc(title)}</b><span>${esc(body)}</span>${btn}</div>`;
+
+/* Voice dictation: Web Speech API where available; iOS keyboard mic always works too. */
+let rec = null, recTarget = null;
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const micBtn = id => SR ? `<button type="button" class="mic" data-a="dictate" data-target="${id}" aria-label="Dictate">${ICON.mic}</button>` : '';
+A.dictate = el => {
+  if (rec && recTarget === el.dataset.target) return stopDictation();
+  stopDictation();
+  const ta = document.getElementById(el.dataset.target); if (!ta) return;
+  try {
+    rec = new SR(); rec.lang = 'en-GB'; rec.continuous = true; rec.interimResults = false; recTarget = el.dataset.target;
+    const base = ta.value;
+    let finalText = '';
+    rec.onresult = ev => { for (let i = ev.resultIndex; i < ev.results.length; i++) if (ev.results[i].isFinal) finalText += ev.results[i][0].transcript; ta.value = (base ? base + ' ' : '') + finalText.trim(); ta.dispatchEvent(new Event('input', { bubbles: true })); };
+    rec.onend = () => { el.classList.remove('on'); rec = null; recTarget = null; };
+    rec.onerror = () => { toast('Dictation unavailable here. Use the mic on your keyboard.'); };
+    rec.start(); el.classList.add('on');
+  } catch (e) { toast('Dictation unavailable here. Use the mic on your keyboard.'); }
+};
+function stopDictation() { try { rec && rec.stop(); } catch (e) { } rec = null; recTarget = null; $$('.mic.on').forEach(m => m.classList.remove('on')); }
+
+/* Theme */
+function applyTheme() {
+  const t = S.settings.theme || 'auto';
+  if (t === 'auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', t);
+}
+
+/* ===================== Today ===================== */
+let todayView = 'list';
+function greeting() { const h = new Date().getHours(); return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening'; }
+function ringSvg(p, size = 84, stroke = 8) {
+  const r = (size - stroke) / 2, c = 2 * Math.PI * r, off = c * (1 - (p ?? 0) / 100);
+  return `<svg viewBox="0 0 ${size} ${size}" aria-hidden="true"><circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="var(--surface-2)" stroke-width="${stroke}"/>
+  <circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="var(--gold)" stroke-width="${stroke}" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${off}"/></svg>`;
+}
+function taskRow(t, o = {}) {
+  const g = t.goalId && goalOf(t.goalId);
+  const conflict = o.date && workConflict(t, o.date);
+  return `<div class="task ${t.status}" data-id="${t.id}">
+    ${o.num ? `<span class="prio-num">${o.num}</span>` : ''}
+    <button class="check" data-a="toggleTask" data-id="${t.id}" aria-label="${t.status === 'done' ? 'Mark not done' : 'Mark done'}: ${esc(t.title)}">${ICON.check}</button>
+    <button class="tbody" data-a="openTask" data-id="${t.id}">
+      <span class="ttl">${esc(t.title)}</span>
+      <span class="meta">${t.pillar ? pillarDot(t.pillar) : ''}${t.time ? `<span class="num">${t.time}</span>` : ''}${t.dur ? `<span>${t.dur} min</span>` : ''}${t.essential ? '<span class="badge ess">Essential</span>' : ''}${t.status === 'skipped' ? `<span>Skipped${t.skipReason ? ' · ' + esc(t.skipReason) : ''}</span>` : ''}${g ? `<span>↳ ${esc(g.title.slice(0, 34))}${g.title.length > 34 ? '…' : ''}</span>` : ''}${conflict ? '<span class="badge warn">During work hours</span>' : ''}</span>
+    </button></div>`;
+}
+SCREENS.today = () => {
+  const date = R.date || today(), isToday = date === today();
+  const day = getDay(date), st = dayStats(date), pr = prioritiesFor(date);
+  const ts = tasksFor(date).filter(t => !pr.ids.includes(t.id));
+  const ess = ts.filter(t => t.essential), grow = ts.filter(t => !t.essential);
+  const hidden = S.tasks.filter(t => t.date === date).length - tasksFor(date).length;
+  const wk = weekStart(date);
+  const unsched = S.tasks.filter(t => !t.date && t.weekStart === wk && t.status === 'open');
+  const j = S.journal[date];
+  const hour = new Date().getHours();
+  const top = `<div class="row grow"><button class="icon-btn" data-a="dayShift" data-n="-1" aria-label="Previous day">${ICON.back}</button>
+    <button class="btn ghost grow" data-a="dayShift" data-n="0" style="justify-content:center">${isToday ? 'Today · ' : ''}${fmtDate(date, { dow: true })}</button>
+    <button class="icon-btn" data-a="dayShift" data-n="1" aria-label="Next day">${ICON.chev}</button></div><div class="save-dot" id="saveDot"><i></i><span>Saved</span></div>`;
+  const ringLbl = day.mode === 'rest' && !st.planned ? '<b>Rest</b>' : `<b>${st.pct ?? 0}%</b><span>${st.done}/${st.planned}</span>`;
+  const html = `
+  <div class="stack">
+    <div class="stack-sm">
+      <h1>${isToday ? `${greeting()}, ${esc(S.settings.name || 'Paul')}` : fmtLong(date)}</h1>
+      <button class="focus" data-a="editFocus" style="background:none;border:0;padding:0;text-align:left">“${esc(focusFor(date))}”</button>
+      <span class="tiny faint">${esc(phaseLabel(date))}</span>
+    </div>
+    <div class="hero">
+      <div class="ring" role="img" aria-label="${st.done} of ${st.planned} done">${ringSvg(st.pct)}<div class="lbl">${ringLbl}</div></div>
+      <div class="stack-sm grow">
+        <b>${day.mode === 'rest' && !st.planned ? 'Rest day' : `${st.done} of ${st.planned} done`}</b>
+        ${st.skipped ? `<span class="small muted">${st.skipped} skipped on purpose</span>` : ''}
+        ${isToday && day.checkin ? `<button class="row small muted" data-a="checkin" style="background:none;border:0;padding:0;gap:10px;flex-wrap:wrap;text-align:left"><span>Sleep <b class="num">${day.checkin.sleep ?? '—'}h</b></span><span>Energy <b class="num">${day.checkin.energy ?? '—'}/5</b></span><span class="link" style="padding:0;min-height:0">Edit</span></button>` : ''}
+      </div>
+    </div>
+    <div class="seg" role="group" aria-label="Day mode">
+      ${[['normal', 'Full day'], ['mvd', 'Minimum day'], ['rest', 'Rest day']].map(([m, l]) => `<button data-a="setMode" data-m="${m}" aria-pressed="${day.mode === m}">${l}</button>`).join('')}
+    </div>
+    <div class="chips scroll" role="group" aria-label="Work day type">${[['office', 'Office day'], ['remote', 'Remote day'], ['off', 'Day off'], ['leave', 'Leave']].map(([w, l]) => `<button class="chip" data-a="setWork" data-w="${w}" aria-pressed="${day.workType === w}">${l}</button>`).join('')}</div>
+    ${day.mode === 'mvd' ? `<div class="callout">Minimum Viable Day: only essentials and a few small habits are shown${hidden ? ` (${hidden} growth items hidden, not counted)` : ''}. That's a win.</div>` : ''}
+    ${day.mode === 'rest' ? `<div class="callout">Rest day. Only core rhythms are shown and nothing else counts against you.</div>` : ''}
+    ${isToday && !day.checkin ? `<button class="card gold row" data-a="checkin" style="text-align:left;width:100%"><span class="grow"><b>Daily check-in</b><br><span class="small muted">Sleep, energy and today's shape. About 30 seconds.</span></span>${ICON.chev.replace('<svg', '<svg width="20" height="20"')}</button>` : ''}
+  </div>
+
+  <section class="section">
+    <div class="section-head"><h2>Top three</h2><button class="link" data-a="editPriorities">${pr.custom ? 'Edit' : 'Suggested · Edit'}</button></div>
+    ${pr.ids.length ? `<div class="list">${pr.ids.map((id, i) => taskRow(S.tasks.find(t => t.id === id), { num: i + 1, date })).join('')}</div>`
+      : `<div class="list">${empty('Nothing to prioritise yet', 'Add a task with +, or schedule one of this week\'s goal actions.')}</div>`}
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2>Today</h2>
+      <div class="seg" style="width:180px">${[['list', 'List'], ['timeline', 'Timeline']].map(([v, l]) => `<button data-a="todayView" data-v="${v}" aria-pressed="${todayView === v}">${l}</button>`).join('')}</div></div>
+    ${todayView === 'list' ? `
+      ${ess.length ? `<span class="eyebrow">Essential commitments</span><div class="list">${ess.map(t => taskRow(t, { date })).join('')}</div>` : ''}
+      ${grow.length ? `<span class="eyebrow">Growth · optional</span><div class="list">${grow.map(t => taskRow(t, { date })).join('')}</div>` : ''}
+      ${!ess.length && !grow.length ? `<div class="list">${empty(date < today() ? 'Nothing was planned for this day' : 'A clear day', date < today() ? 'Past days are never back-filled.' : 'Tap + to add something, or enjoy the space.')}</div>` : ''}`
+      : timelineHtml(date)}
+  </section>
+
+  ${unsched.length ? `<section class="section"><div class="section-head"><h2>This week, not yet scheduled</h2></div>
+    <div class="list">${unsched.map(t => `<div class="task"><span class="grow"><span class="ttl">${esc(t.title)}</span><br><span class="meta">${t.pillar ? pillarDot(t.pillar) : ''}${t.goalId && goalOf(t.goalId) ? esc(goalOf(t.goalId).title.slice(0, 40)) : ''}</span></span><button class="btn sm" data-a="scheduleHere" data-id="${t.id}">${isToday ? 'Do today' : 'This day'}</button></div>`).join('')}</div></section>` : ''}
+
+  <section class="section">
+    <div class="row">
+      <button class="btn block ${hour < 12 && isToday ? 'primary' : ''}" data-a="openJournal" data-part="morning">${ICON.sun} Morning${j?.morning && Object.values(j.morning).some(Boolean) ? ' ✓' : ''}</button>
+      <button class="btn block ${hour >= 17 && isToday ? 'primary' : ''}" data-a="openJournal" data-part="evening">${ICON.moon} Evening reflection${j?.evening && Object.values(j.evening).some(Boolean) ? ' ✓' : ''}</button>
+    </div>
+  </section>`;
+  return { top, html };
+};
+function timelineHtml(date) {
+  const items = scheduleFor(date);
+  const untimed = tasksFor(date).filter(t => !t.time);
+  if (!items.length && !untimed.length) return `<div class="list">${empty('Nothing scheduled', 'Timed tasks and work hours appear here.')}</div>`;
+  return `<div class="tl">${items.map(it => it.task ? `<div class="tl-item"><span class="tl-time">${it.time}</span><div class="list">${taskRow(it.task, { date })}</div></div>`
+    : `<div class="tl-item"><span class="tl-time">${it.time || 'All day'}</span><div class="tl-block ${it.fixed ? 'fixed' : ''}" style="border-left-color:${it.pillar ? P[it.pillar].color : 'var(--ink-3)'}"><b>${esc(it.title)}</b>${it.end ? ` <span class="faint num">until ${it.end}</span>` : ''}${it.event ? ' <span class="badge">Calendar</span>' : ''}</div></div>`).join('')}
+    ${untimed.length ? `<div class="tl-item"><span class="tl-time">Any time</span><div class="list">${untimed.map(t => taskRow(t, { date })).join('')}</div></div>` : ''}</div>`;
+}
+A.todayView = el => { todayView = el.dataset.v; render(); };
+A.dayShift = el => { const n = Number(el.dataset.n); R.date = n === 0 ? today() : addDays(R.date || today(), n); render(); };
+A.setMode = el => {
+  const date = R.date || today(), day = getDay(date); day.mode = el.dataset.m; save('days'); render();
+  if (day.mode === 'mvd') toast('Minimum Viable Day: essentials only. Growth items aren\'t counted.');
+  if (day.mode === 'rest') toast('Rest day set. Nothing here counts against you.');
+};
+A.setWork = el => { const date = R.date || today(), day = getDay(date); day.workType = el.dataset.w; save('days'); if (date >= today()) regenerateForWorkType(date); render(); };
+
+const LOG_KIND = { workout: 'Workout', keyboard: 'Keyboard practice', trading: 'Trading study', comms: 'Communication drill', cpd: 'CPD / learning' };
+A.toggleTask = el => {
+  const t = S.tasks.find(x => x.id === el.dataset.id); if (!t) return;
+  const was = t.status;
+  t.status = t.status === 'done' ? 'open' : 'done'; t.doneAt = t.status === 'done' ? nowIso() : null; delete t.skipReason; touch(t);
+  save('tasks'); render();
+  if (t.status === 'done' && t.kind && LOG_KIND[t.kind]) {
+    toast(`Done. Log ${LOG_KIND[t.kind].toLowerCase()} details?`); const btn = document.createElement('button'); btn.textContent = 'Log'; btn.dataset.a = 'logFromTask'; btn.dataset.id = t.id; $('#toast')?.appendChild(btn);
+  } else if (t.status === 'done') { if (navigator.vibrate) navigator.vibrate(8); }
+  else if (was === 'done') toast('Marked not done');
+};
+A.logFromTask = el => { const t = S.tasks.find(x => x.id === el.dataset.id); $('#toast')?.remove(); openLog(t.kind, { mins: t.dur, date: t.date, taskId: t.id }); };
+A.scheduleHere = el => { const t = S.tasks.find(x => x.id === el.dataset.id); t.date = R.date || today(); touch(t); save('tasks'); render(); toast('Scheduled'); };
+
+function goalOptions(sel) { return `<option value="">No linked goal</option>${S.goals.filter(g => g.status !== 'done').map(g => `<option value="${g.id}" ${sel === g.id ? 'selected' : ''}>${esc(P[g.pillar]?.short || '')} · ${esc(g.title)}</option>`).join('')}`; }
+A.quickAdd = (el) => {
+  const gid = el?.dataset?.goal || (R.sub === 'goal' ? R.arg : '');
+  const g = gid && goalOf(gid);
+  openSheet('Add', `
+    <input type="text" id="qaTitle" placeholder="What needs doing?" autocomplete="off" enterkeyhint="done">
+    <div class="chips" id="qaWhen">${[['today', 'Today'], ['tomorrow', 'Tomorrow'], ['week', 'This week'], ['date', 'Pick date']].map(([v, l], i) => `<button class="chip" data-a="qaWhen" data-v="${v}" aria-pressed="${g ? v === 'week' : i === 0}">${l}</button>`).join('')}</div>
+    <div class="field-row" id="qaDateRow" hidden><label class="f">Date<input type="date" id="qaDate" value="${addDays(today(), 2)}"></label><span></span></div>
+    <div class="field-row"><label class="f">Area${pillarSelect('qaPillar', g ? g.pillar : '')}</label><label class="f">Time (optional)<input type="time" id="qaTime"></label></div>
+    <label class="f">Linked goal<select id="qaGoal">${goalOptions(gid)}</select></label>
+    ${toggleRow('qaEss', 'Essential commitment', false, 'Shown even on a Minimum Viable Day')}
+    <button class="btn primary block" data-a="qaSave">Add</button>`, { after: b => setTimeout(() => $('#qaTitle', b).focus(), 250) });
+  $('#qaTitle').addEventListener('keydown', e => { if (e.key === 'Enter') A.qaSave(); });
+};
+A.qaWhen = el => { $$('#qaWhen .chip').forEach(c => c.setAttribute('aria-pressed', c === el)); $('#qaDateRow').hidden = el.dataset.v !== 'date'; };
+A.qaSave = () => {
+  const title = val('qaTitle').trim(); if (!title) { $('#qaTitle').focus(); return; }
+  const when = $('#qaWhen [aria-pressed="true"]').dataset.v; const base = R.date || today();
+  const date = when === 'today' ? base : when === 'tomorrow' ? addDays(base, 1) : when === 'date' ? val('qaDate') : null;
+  const goalId = val('qaGoal'); const g = goalId && goalOf(goalId);
+  S.tasks.push(touch({ id: uid('t'), title, pillar: val('qaPillar') || (g ? g.pillar : ''), date, weekStart: date ? weekStart(date) : weekStart(base), time: val('qaTime') || null, dur: null, essential: val('qaEss'), goalId: goalId || null, status: 'open', source: when === 'week' ? 'weekly' : 'manual', createdAt: nowIso() }));
+  save('tasks'); closeSheet(); render(); toast(date ? `Added to ${date === today() ? 'today' : fmtDate(date, { dow: true })}` : 'Added to this week');
+};
+A.openTask = el => {
+  const t = S.tasks.find(x => x.id === el.dataset.id); if (!t) return;
+  const date = R.date || today(); const isPrio = prioritiesFor(t.date || date).ids.includes(t.id);
+  openSheet('Task', `
+    <input type="text" id="tTitle" value="${esc(t.title)}">
+    <div class="field-row"><label class="f">Area${pillarSelect('tPillar', t.pillar)}</label><label class="f">Date<input type="date" id="tDate" value="${t.date || ''}"></label></div>
+    <div class="field-row"><label class="f">Time<input type="time" id="tTime" value="${t.time || ''}"></label><label class="f">Minutes (estimate)<input type="number" inputmode="numeric" id="tDur" value="${t.dur ?? ''}"></label></div>
+    <label class="f">Linked goal<select id="tGoal">${goalOptions(t.goalId)}</select></label>
+    ${toggleRow('tEss', 'Essential commitment', t.essential)}
+    <label class="f">Notes${textArea('tNotes', t.notes, 'Optional')}</label>
+    <button class="btn primary block" data-a="tSave" data-id="${t.id}">Save</button>
+    <span class="eyebrow">Reschedule</span>
+    <div class="chips"><button class="chip" data-a="tMove" data-id="${t.id}" data-to="tomorrow">Tomorrow</button><button class="chip" data-a="tMove" data-id="${t.id}" data-to="week">Later this week</button><button class="chip" data-a="tMove" data-id="${t.id}" data-to="nextweek">Next week</button>${t.date ? `<button class="chip" data-a="togglePrio" data-id="${t.id}">${isPrio ? 'Remove from top three' : 'Make a top-three priority'}</button>` : ''}</div>
+    <span class="eyebrow">Skip on purpose (not counted against you)</span>
+    <div class="chips">${['Rest', 'Unavoidable change', 'Deprioritised', 'Ill / recovering'].map(r => `<button class="chip" data-a="tSkip" data-id="${t.id}" data-r="${r}" aria-pressed="${t.skipReason === r}">${r}</button>`).join('')}</div>
+    ${t.status === 'skipped' ? `<button class="btn block" data-a="tUnskip" data-id="${t.id}">Undo skip</button>` : ''}
+    <button class="btn ghost danger block" data-a="tDelete" data-id="${t.id}">${ICON.trash} Delete task</button>
+    ${t.routineId ? '<p class="tiny faint">This came from a routine. Edit routines in More → Routines.</p>' : ''}`);
+};
+A.tSave = el => {
+  const t = S.tasks.find(x => x.id === el.dataset.id);
+  Object.assign(t, { title: val('tTitle').trim() || t.title, pillar: val('tPillar'), date: val('tDate') || null, time: val('tTime') || null, dur: val('tDur') ? Number(val('tDur')) : null, goalId: val('tGoal') || null, essential: val('tEss'), notes: val('tNotes') });
+  if (t.date) t.weekStart = weekStart(t.date);
+  touch(t); save('tasks'); closeSheet(); render(); toast('Saved');
+};
+A.tMove = el => {
+  const t = S.tasks.find(x => x.id === el.dataset.id), base = t.date || today();
+  if (el.dataset.to === 'tomorrow') { t.date = addDays(base, 1); }
+  else if (el.dataset.to === 'week') { t.date = null; t.weekStart = weekStart(base); }
+  else { t.date = null; t.weekStart = addDays(weekStart(base), 7); }
+  if (t.date) t.weekStart = weekStart(t.date);
+  t.status = 'open'; t.anchor = false; t.rescheduled = (t.rescheduled || 0) + 1; touch(t); save('tasks'); closeSheet(); render(); toast('Rescheduled');
+};
+A.tSkip = el => { const t = S.tasks.find(x => x.id === el.dataset.id); t.status = 'skipped'; t.skipReason = el.dataset.r; touch(t); save('tasks'); closeSheet(); render(); toast('Skipped on purpose'); };
+A.tUnskip = el => { const t = S.tasks.find(x => x.id === el.dataset.id); t.status = 'open'; delete t.skipReason; touch(t); save('tasks'); closeSheet(); render(); };
+A.tDelete = el => {
+  const i = S.tasks.findIndex(x => x.id === el.dataset.id); const [t] = S.tasks.splice(i, 1);
+  tombstone('tasks', t.id); save('tasks'); closeSheet(); render();
+  toast('Task deleted', () => { S.tasks.push(t); untombstone(t.id); save('tasks'); render(); });
+};
+A.togglePrio = el => {
+  const t = S.tasks.find(x => x.id === el.dataset.id), day = getDay(t.date);
+  let ids = prioritiesFor(t.date).ids.slice();
+  ids = ids.includes(t.id) ? ids.filter(x => x !== t.id) : [t.id, ...ids].slice(0, 3);
+  day.priorities = ids; save('days'); closeSheet(); render();
+};
+A.editPriorities = () => {
+  const date = R.date || today(), cur = prioritiesFor(date).ids;
+  const ts = tasksFor(date).filter(t => t.status !== 'skipped');
+  openSheet('Top three', `<p class="small muted">Pick up to three. Suggestions favour goal-linked actions, goals at risk and areas you haven't touched this week.</p>
+    <div class="list">${ts.map(t => `<label class="task"><input type="checkbox" class="switch" data-prio="${t.id}" ${cur.includes(t.id) ? 'checked' : ''}><span class="grow"><span class="ttl">${esc(t.title)}</span><br><span class="meta">${t.pillar ? pillarDot(t.pillar) : ''}${t.time || ''}</span></span></label>`).join('') || empty('No tasks today', 'Add one with +')}</div>
+    <div class="row"><button class="btn block" data-a="prioReset">Use suggestions</button><button class="btn primary block" data-a="prioSave">Save</button></div>`);
+};
+A.prioSave = () => { const ids = $$('[data-prio]').filter(c => c.checked).map(c => c.dataset.prio).slice(0, 3); getDay(R.date || today()).priorities = ids; save('days'); closeSheet(); render(); };
+A.prioReset = () => { getDay(R.date || today()).priorities = null; save('days'); closeSheet(); render(); };
+A.editFocus = () => {
+  const date = R.date || today(), day = getDay(date);
+  openSheet('Daily focus', `<input type="text" id="focusIn" value="${esc(day.focus || '')}" placeholder="${esc(focusFor(date))}">
+  <p class="tiny faint">Leave blank to use your morning journal answer or the quarter's theme.</p><button class="btn primary block" data-a="focusSave">Save</button>`);
+};
+A.focusSave = () => { getDay(R.date || today()).focus = val('focusIn').trim(); save('days'); closeSheet(); render(); };
+A.checkin = () => {
+  const date = today(), c = getDay(date).checkin || {};
+  openSheet('Daily check-in', `
+    <label class="f">Hours slept <b class="num" id="slpOut">${c.sleep ?? 7}</b><input type="range" id="ciSleep" min="3" max="10" step="0.5" value="${c.sleep ?? 7}" data-on="slp"></label>
+    <label class="f">Energy</label>${scaleInput('ciEnergy', c.energy, 5, ['Drained', 'Low', 'OK', 'Good', 'Great'])}
+    <label class="f">Body and recovery</label>${scaleInput('ciRecovery', c.recovery)}
+    <label class="f">Overall wellbeing</label>${scaleInput('ciWell', c.wellbeing)}
+    <label class="f">Anything on your mind? (optional)<input type="text" id="ciNote" value="${esc(c.note || '')}"></label>
+    <button class="btn primary block" data-a="ciSave">Save check-in</button>
+    <p class="tiny faint" id="ciHint"></p>`);
+};
+ON.slp = el => { $('#slpOut').textContent = el.value; };
+A.ciSave = () => {
+  const day = getDay(today());
+  day.checkin = { sleep: Number(val('ciSleep')), energy: scaleVal('ciEnergy'), recovery: scaleVal('ciRecovery'), wellbeing: scaleVal('ciWell'), note: val('ciNote'), at: nowIso() };
+  save('days'); closeSheet();
+  if ((day.checkin.energy && day.checkin.energy <= 2) || day.checkin.sleep < 6) {
+    openSheet('Lighter day?', `<p>Low energy or short sleep. A Minimum Viable Day keeps essentials and a few small habits, and nothing else counts.</p>
+    <div class="row"><button class="btn block" data-a="closeSheet">Keep full day</button><button class="btn primary block" data-a="setMode" data-m="mvd">Switch to Minimum</button></div>`);
+    A.setMode = (orig => el => { closeSheet(true); A.setMode = orig; orig(el); })(A.setMode);
+  }
+  render();
+};
+
+/* ===================== Goals cascade ===================== */
+let goalView = 'year', goalPillar = 'all', goalCycle = null;
+const statusBadge = s => { const [l, c] = GOAL_STATUS[s] || GOAL_STATUS.notstarted; return `<span class="badge ${c}">${l}</span>`; };
+function cycleGoals(cs) { return S.goals.filter(g => (g.cycle || yearStart()) === cs); }
+function currentCycleStart() { return goalCycle || cycleFor(today() < yearStart() ? yearStart() : today()).start; }
+
+SCREENS.goals = () => {
+  const cs = currentCycleStart(), cyc = cycleFor(cs);
+  const refDate = today() < cs ? cs : (today() > cyc.end ? cyc.end : today());
+  const q = quarterOf(refDate);
+  const goals = cycleGoals(cs).filter(g => goalPillar === 'all' || g.pillar === goalPillar);
+  const cycles = [...new Set([yearStart(), ...S.goals.map(g => g.cycle).filter(Boolean)])].sort();
+  const yearMap = `<div class="card tight"><div class="row between"><span class="eyebrow">Year ${cyc.label} · ${fmtDate(cyc.start, { year: true })} – ${fmtDate(cyc.end, { year: true })}</span>${cycles.length > 1 ? `<select id="cycSel" data-onchange="cycSel" style="width:auto;min-height:34px;padding:4px 8px">${cycles.map(c => `<option value="${c}" ${c === cs ? 'selected' : ''}>${cycleFor(c).label}</option>`).join('')}</select>` : ''}</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px">${PHASES.map(ph => { const r = quarterRange(cs, ph.q); const cur = refDate >= r.start && refDate <= r.end; return `<div style="padding:8px;border-radius:10px;background:${cur ? 'var(--navy)' : 'var(--surface-2)'};color:${cur ? 'var(--bg)' : 'var(--ink-2)'}"><b style="font-family:var(--serif)">Q${ph.q}</b><div class="tiny" style="opacity:.85">${fmtDate(r.start)}</div></div>`; }).join('')}</div>
+    <p class="small muted" style="margin-top:8px">Now: <b>Q${q.q}</b> · ${esc(q.phase)}</p></div>`;
+  const views = `<div class="seg">${[['year', 'Year'], ['quarter', 'Quarter'], ['month', 'Month'], ['week', 'Week']].map(([v, l]) => `<button data-a="goalView" data-v="${v}" aria-pressed="${goalView === v}">${l}</button>`).join('')}</div>`;
+  const chips = `<div class="chips scroll"><button class="chip" data-a="goalPillar" data-p="all" aria-pressed="${goalPillar === 'all'}">All areas</button>${PILLARS.map(p => `<button class="chip" data-a="goalPillar" data-p="${p.id}" aria-pressed="${goalPillar === p.id}">${pillarDot(p.id)} ${esc(p.short)}</button>`).join('')}</div>`;
+  let body = '';
+  if (goalView === 'year') {
+    body = goals.length ? PILLARS.filter(p => goals.some(g => g.pillar === p.id)).map(p => `<div class="stack-sm"><span class="eyebrow">${esc(p.name)}</span><div class="list">${goals.filter(g => g.pillar === p.id).map(goalCard).join('')}</div></div>`).join('')
+      : `<div class="list">${empty('No goals here yet', 'Add an annual goal to start the cascade.')}</div>`;
+    body += `<button class="btn block" data-a="newGoal">${ICON.plus} Add annual goal</button>`;
+    if (today() >= quarterRange(cs, 4).start && !cycles.includes(addMonths(cs, 12))) body += `<button class="btn block gold" data-a="newCycle">Start ${cycleFor(addMonths(cs, 12)).label}: carry goals forward</button>`;
+  } else if (goalView === 'quarter') {
+    body = [1, 2, 3, 4].map(qq => { const r = quarterRange(cs, qq); const ms = S.milestones.filter(m => m.kind === 'quarter' && m.q === qq && goals.some(g => g.id === m.goalId));
+      const done = ms.filter(m => m.done).length;
+      return `<details ${qq === q.q ? 'open' : ''}><summary>Q${qq} · ${fmtDate(r.start)}–${fmtDate(r.end)} <span class="faint small num" style="margin-left:auto">${done}/${ms.length}</span></summary>
+      <p class="small muted" style="margin-bottom:8px">${esc(PHASES[qq - 1].name)}</p><div class="list">${ms.length ? ms.map(m => msRow(m, true)).join('') : empty('No milestones', 'Add them from a goal.')}</div></details>`; }).join('');
+  } else if (goalView === 'month') {
+    const mk = monthKey(refDate);
+    const months = Array.from({ length: 12 }, (_, i) => monthKey(addMonths(cs, i)));
+    body = `<div class="chips scroll">${months.map(m => `<button class="chip" data-a="goalMonth" data-m="${m}" aria-pressed="${(R.goalMonth || mk) === m}">${MON[Number(m.slice(5)) - 1]} ${m.slice(2, 4)}</button>`).join('')}</div>`;
+    const sel = R.goalMonth || mk;
+    const ms = S.milestones.filter(m => m.kind === 'month' && m.period === sel && goals.some(g => g.id === m.goalId));
+    body += `<h3>${fmtMonth(sel)} objectives</h3><div class="list">${ms.length ? ms.map(m => msRow(m, true)).join('') : empty('No objectives for this month', 'Open a goal and add a monthly objective. Keep it to one or two per goal.')}</div>`;
+  } else {
+    const wk = weekStart(today());
+    const ts = S.tasks.filter(t => (t.weekStart === wk || (t.date && weekStart(t.date) === wk)) && (t.goalId || t.source === 'weekly') && (goalPillar === 'all' || t.pillar === goalPillar));
+    body = `<h3>Week of ${fmtDate(wk)}</h3><p class="small muted">Weekly actions linked to goals. Schedule them onto a day, or leave them floating for the week.</p>
+    <div class="list">${ts.length ? ts.map(t => `<div class="task ${t.status}"><button class="check" data-a="toggleTask" data-id="${t.id}" aria-label="Toggle">${ICON.check}</button><button class="tbody" data-a="openTask" data-id="${t.id}"><span class="ttl">${esc(t.title)}</span><span class="meta">${t.pillar ? pillarDot(t.pillar) : ''}${t.date ? fmtDate(t.date, { dow: true }) : 'Not scheduled'}${t.goalId && goalOf(t.goalId) ? ' · ' + esc(goalOf(t.goalId).title.slice(0, 30)) : ''}</span></button></div>`).join('') : empty('No weekly actions yet', 'Tap + and choose "This week", or add from a goal.')}</div>`;
+  }
+  return { title: 'Goals', html: `<div class="stack">${yearMap}${views}${chips}${body}</div>` };
+};
+function goalCard(g) {
+  const p = goalProgress(g);
+  const next = S.milestones.filter(m => m.goalId === g.id && !m.done).sort((a, b) => (a.due || '').localeCompare(b.due || ''))[0];
+  return `<button class="goal-card" data-a="openGoal" data-id="${g.id}"><span class="row between"><span class="ttl" style="font-weight:600">${esc(g.title)}</span>${statusBadge(g.status)}</span>
+  <span class="row"><span class="bar grow"><i style="width:${p}%;background:${P[g.pillar].color}"></i></span><span class="small num faint">${p}%</span></span>
+  ${next ? `<span class="small muted">Next: ${esc(next.title)}${next.period ? ` · ${next.kind === 'quarter' ? next.period : fmtMonth(next.period)}` : ''}</span>` : ''}</button>`;
+}
+function msRow(m, showGoal) {
+  const g = goalOf(m.goalId);
+  return `<div class="task ${m.done ? 'done' : ''}"><button class="check" data-a="toggleMs" data-id="${m.id}" aria-label="Toggle milestone">${ICON.check}</button>
+  <button class="tbody" data-a="editMs" data-id="${m.id}"><span class="ttl">${esc(m.title)}</span><span class="meta">${showGoal && g ? `${pillarDot(g.pillar)} ${esc(g.title.slice(0, 40))}` : ''}${m.done && m.doneAt ? ` · done ${fmtDate(m.doneAt.slice(0, 10))}` : ''}</span></button></div>`;
+}
+A.goalView = el => { goalView = el.dataset.v; render(); };
+A.goalPillar = el => { goalPillar = el.dataset.p; render(); };
+A.goalMonth = el => { R.goalMonth = el.dataset.m; render(); };
+ON.cycSel = el => { goalCycle = el.value; render(); };
+A.openGoal = el => go('goals', 'goal', el.dataset.id, true);
+A.toggleMs = el => { const m = S.milestones.find(x => x.id === el.dataset.id); m.done = !m.done; m.doneAt = m.done ? nowIso() : null; touch(m); save('milestones'); render(); if (m.done) toast('Milestone achieved'); };
+
+SCREENS.goal = () => {
+  const g = goalOf(R.arg); if (!g) { R.sub = null; return SCREENS.goals(); }
+  const p = goalProgress(g), cs = g.cycle || yearStart();
+  const ms = S.milestones.filter(m => m.goalId === g.id);
+  const wk = weekStart(today());
+  const weekTs = S.tasks.filter(t => t.goalId === g.id && (t.weekStart === wk || (t.date && weekStart(t.date) === wk)));
+  const allTs = S.tasks.filter(t => t.goalId === g.id);
+  const mk = monthKey(today());
+  const months = [...new Set(ms.filter(m => m.kind === 'month').map(m => m.period))].sort();
+  const html = `<div class="stack">
+    <div class="stack-sm"><span class="eyebrow">${pillarDot(g.pillar)} ${esc(P[g.pillar].name)}</span><h1>${esc(g.title)}</h1></div>
+    <div class="card stack-sm">
+      <div class="row between"><b>${p}% complete</b>${statusBadge(g.status)}</div>
+      <div class="bar"><i style="width:${p}%;background:${P[g.pillar].color}"></i></div>
+      <span class="tiny faint">${g.progressMode === 'manual' ? 'Self-assessed progress' : 'Calculated from milestones and objectives achieved'}</span>
+      <div class="chips" style="margin-top:6px">${Object.entries(GOAL_STATUS).map(([k, [l]]) => `<button class="chip" style="min-height:32px;font-size:.8rem;padding:4px 10px" data-a="goalStatus" data-s="${k}" aria-pressed="${g.status === k}">${l}</button>`).join('')}</div>
+    </div>
+    <div class="card stack-sm">
+      <div class="row between"><span class="eyebrow">Why it matters</span><button class="link" data-a="editGoal" data-id="${g.id}">Edit goal</button></div>
+      <p>${esc(g.why) || '<span class="faint">Not written yet</span>'}</p>
+      <span class="eyebrow">Success looks like</span><p>${esc(g.criteria) || '<span class="faint">Add measurable criteria</span>'}</p>
+      <span class="eyebrow">Target date</span><p class="num">${g.targetDate ? fmtDate(g.targetDate, { year: true }) : '—'}</p>
+      ${g.deps ? `<span class="eyebrow">Dependencies</span><p>${esc(g.deps)}</p>` : ''}
+      ${g.risks ? `<span class="eyebrow">Risks</span><p>${esc(g.risks)}</p>` : ''}
+    </div>
+    <section class="section"><div class="section-head"><h2>Quarterly milestones</h2></div>
+      ${[1, 2, 3, 4].map(q => { const r = quarterRange(cs, q); const list = ms.filter(m => m.kind === 'quarter' && m.q === q);
+        return `<div class="stack-sm"><div class="row between"><span class="eyebrow">Q${q} · ${fmtDate(r.start)}–${fmtDate(r.end)}</span><button class="link" data-a="addMs" data-kind="quarter" data-q="${q}">+ Add</button></div>${list.length ? `<div class="list">${list.map(m => msRow(m)).join('')}</div>` : ''}</div>`; }).join('')}
+    </section>
+    <section class="section"><div class="section-head"><h2>Monthly objectives</h2><button class="link" data-a="addMs" data-kind="month">+ Add</button></div>
+      ${months.length ? months.map(mo => `<div class="stack-sm"><span class="eyebrow">${fmtMonth(mo)}${mo === mk ? ' · this month' : ''}</span><div class="list">${ms.filter(m => m.kind === 'month' && m.period === mo).map(m => msRow(m)).join('')}</div></div>`).join('') : `<div class="list">${empty('No monthly objectives yet', 'Break this quarter\'s milestone into one or two objectives for this month.')}</div>`}
+    </section>
+    <section class="section"><div class="section-head"><h2>This week's actions</h2><button class="link" data-a="quickAdd" data-goal="${g.id}">+ Add</button></div>
+      <div class="list">${weekTs.length ? weekTs.map(t => `<div class="task ${t.status}"><button class="check" data-a="toggleTask" data-id="${t.id}" aria-label="Toggle">${ICON.check}</button><button class="tbody" data-a="openTask" data-id="${t.id}"><span class="ttl">${esc(t.title)}</span><span class="meta">${t.date ? fmtDate(t.date, { dow: true }) : 'Not scheduled'}</span></button></div>`).join('') : empty('No actions this week', 'One small, concrete action is enough.')}</div>
+      <p class="tiny faint">${allTs.filter(t => t.status === 'done').length} linked actions completed in total.</p>
+    </section>
+    <section class="section"><div class="section-head"><h2>Evidence of progress</h2><button class="link" data-a="addEvidence">+ Add</button></div>
+      <div class="list">${(g.evidence || []).length ? g.evidence.slice().reverse().map((e, i) => `<div class="task"><span class="grow"><span class="ttl">${esc(e.text)}</span><br><span class="meta num">${fmtDate(e.date, { year: true })}</span></span><button class="icon-btn" data-a="delEvidence" data-i="${g.evidence.length - 1 - i}" aria-label="Delete evidence">${ICON.trash}</button></div>`).join('') : empty('No evidence yet', 'Record outcomes, links, feedback or results as they happen.')}</div>
+    </section>
+    <button class="btn ghost danger block" data-a="delGoal">${ICON.trash} Delete goal</button>
+  </div>`;
+  return { title: P[g.pillar].short, html };
+};
+A.goalStatus = el => { const g = goalOf(R.arg); g.status = el.dataset.s; touch(g); save('goals'); render(); };
+function goalForm(g = {}) {
+  return `<label class="f">Goal<input type="text" id="gTitle" value="${esc(g.title || '')}" placeholder="e.g. Build working mastery of…"></label>
+  <label class="f">Area${pillarSelect('gPillar', g.pillar || (goalPillar !== 'all' ? goalPillar : 'pro'), false)}</label>
+  <label class="f">Why it matters${textArea('gWhy', g.why)}</label>
+  <label class="f">Measurable success criteria${textArea('gCrit', g.criteria)}</label>
+  <div class="field-row"><label class="f">Target date<input type="date" id="gTarget" value="${g.targetDate || cycleFor(currentCycleStart()).end}"></label>
+  <label class="f">Progress<select id="gMode"><option value="auto" ${g.progressMode !== 'manual' ? 'selected' : ''}>From milestones</option><option value="manual" ${g.progressMode === 'manual' ? 'selected' : ''}>Self-assessed</option></select></label></div>
+  ${g.progressMode === 'manual' ? `<label class="f">Self-assessed progress <b id="gpOut">${g.progress || 0}%</b><input type="range" id="gProg" min="0" max="100" step="5" value="${g.progress || 0}" data-on="gp"></label>` : ''}
+  <label class="f">Dependencies<input type="text" id="gDeps" value="${esc(g.deps || '')}" placeholder="What does this rely on?"></label>
+  <label class="f">Risks<input type="text" id="gRisks" value="${esc(g.risks || '')}" placeholder="What could get in the way?"></label>`;
+}
+ON.gp = el => { $('#gpOut').textContent = el.value + '%'; };
+function readGoalForm(g) {
+  Object.assign(g, { title: val('gTitle').trim() || g.title || 'Untitled goal', pillar: val('gPillar'), why: val('gWhy'), criteria: val('gCrit'), targetDate: val('gTarget'), progressMode: val('gMode'), deps: val('gDeps'), risks: val('gRisks') });
+  if ($('#gProg')) g.progress = Number(val('gProg'));
+  return touch(g);
+}
+A.newGoal = () => openSheet('New annual goal', goalForm() + `<button class="btn primary block" data-a="saveNewGoal">Create goal</button>`);
+A.saveNewGoal = () => {
+  if (!val('gTitle').trim()) return $('#gTitle').focus();
+  const g = readGoalForm({ id: uid('g'), cycle: currentCycleStart(), status: 'notstarted', progress: 0, evidence: [], createdAt: nowIso() });
+  S.goals.push(g); save('goals'); closeSheet(); go('goals', 'goal', g.id, true);
+};
+A.editGoal = () => { const g = goalOf(R.arg); openSheet('Edit goal', goalForm(g) + `<button class="btn primary block" data-a="saveGoal">Save</button>`); };
+A.saveGoal = () => { readGoalForm(goalOf(R.arg)); save('goals'); closeSheet(); render(); };
+A.delGoal = () => openSheet('Delete this goal?', `<p>This removes the goal and its milestones and objectives. Linked tasks stay but lose the link.</p><button class="btn danger block" data-a="confirmDelGoal">Delete goal</button>`);
+A.confirmDelGoal = () => {
+  const id = R.arg; S.goals = S.goals.filter(g => g.id !== id); tombstone('goals', id);
+  S.milestones.filter(m => m.goalId === id).forEach(m => tombstone('milestones', m.id));
+  S.milestones = S.milestones.filter(m => m.goalId !== id);
+  S.tasks.forEach(t => { if (t.goalId === id) { t.goalId = null; touch(t); } });
+  save('goals', 'milestones', 'tasks'); closeSheet(); back();
+};
+A.addMs = el => {
+  const kind = el.dataset.kind, g = goalOf(R.arg), cs = g.cycle || yearStart();
+  const months = Array.from({ length: 12 }, (_, i) => monthKey(addMonths(cs, i)));
+  openSheet(kind === 'quarter' ? `Q${el.dataset.q} milestone` : 'Monthly objective', `
+    <input type="text" id="msTitle" placeholder="${kind === 'quarter' ? 'A clear, checkable milestone' : 'One objective for the month'}">
+    ${kind === 'month' ? `<label class="f">Month<select id="msMonth">${months.map(m => `<option value="${m}" ${m === monthKey(today()) ? 'selected' : ''}>${fmtMonth(m)}</option>`).join('')}</select></label>` : ''}
+    <button class="btn primary block" data-a="saveMs" data-kind="${kind}" data-q="${el.dataset.q || ''}">Add</button>`, { after: b => setTimeout(() => $('#msTitle', b).focus(), 250) });
+};
+A.saveMs = el => {
+  const title = val('msTitle').trim(); if (!title) return;
+  const g = goalOf(R.arg), cs = g.cycle || yearStart(), kind = el.dataset.kind;
+  const m = { id: uid('m'), goalId: g.id, kind, title, done: false };
+  if (kind === 'quarter') { m.q = Number(el.dataset.q); m.period = `Q${m.q}`; m.due = quarterRange(cs, m.q).end; }
+  else { m.period = val('msMonth'); m.due = addDays(addMonths(m.period + '-01', 1), -1); }
+  S.milestones.push(touch(m)); save('milestones'); closeSheet(); render();
+};
+A.editMs = el => {
+  const m = S.milestones.find(x => x.id === el.dataset.id);
+  openSheet('Milestone', `<input type="text" id="msEdit" value="${esc(m.title)}"><button class="btn primary block" data-a="saveMsEdit" data-id="${m.id}">Save</button><button class="btn ghost danger block" data-a="delMs" data-id="${m.id}">${ICON.trash} Delete</button>`);
+};
+A.saveMsEdit = el => { const m = S.milestones.find(x => x.id === el.dataset.id); m.title = val('msEdit').trim() || m.title; touch(m); save('milestones'); closeSheet(); render(); };
+A.delMs = el => { S.milestones = S.milestones.filter(x => x.id !== el.dataset.id); tombstone('milestones', el.dataset.id); save('milestones'); closeSheet(); render(); };
+A.addEvidence = () => openSheet('Evidence of progress', `<label class="f">Date<input type="date" id="evDate" value="${today()}"></label><label class="f">What happened?${textArea('evText', '', 'Outcome, result, feedback, link…')}</label><p class="tiny faint">Keep employer-confidential details out of this app.</p><button class="btn primary block" data-a="saveEvidence">Add evidence</button>`);
+A.saveEvidence = () => { const t = val('evText').trim(); if (!t) return; const g = goalOf(R.arg); (g.evidence = g.evidence || []).push({ date: val('evDate') || today(), text: t }); touch(g); save('goals'); closeSheet(); render(); };
+A.delEvidence = el => { const g = goalOf(R.arg); g.evidence.splice(Number(el.dataset.i), 1); touch(g); save('goals'); render(); };
+A.newCycle = () => {
+  const cs = currentCycleStart(), ns = addMonths(cs, 12), nc = cycleFor(ns);
+  const list = cycleGoals(cs);
+  openSheet(`Start ${nc.label}`, `<p class="small muted">Choose goals to carry into the new year. They start fresh with no milestones; history stays with ${cycleFor(cs).label}.</p>
+    <div class="list">${list.map(g => `<label class="task"><input type="checkbox" class="switch" data-carry="${g.id}" ${g.status !== 'done' ? 'checked' : ''}><span class="grow">${esc(g.title)}</span></label>`).join('')}</div>
+    <button class="btn primary block" data-a="confirmCycle">Create ${nc.label}</button>`);
+};
+A.confirmCycle = () => {
+  const ns = addMonths(currentCycleStart(), 12), nc = cycleFor(ns);
+  $$('[data-carry]').filter(c => c.checked).forEach(c => { const g = goalOf(c.dataset.carry); S.goals.push(touch({ ...g, id: uid('g'), cycle: ns, targetDate: nc.end, status: 'notstarted', progress: 0, evidence: [], carriedFrom: g.id, createdAt: nowIso() })); });
+  save('goals'); goalCycle = ns; closeSheet(); render(); toast(`${nc.label} created`);
+};
+
+/* ===================== Journal & reviews ===================== */
+let jPart = null;
+const PROMPTS = {
+  morning: [['matters', 'What matters most today?'], ['grateful', 'What am I grateful for?'], ['action', 'What is one action that will move me forward?']],
+  evening: [['accomplished', 'What did I accomplish?'], ['learned', 'What did I learn?'], ['challenged', 'What challenged me?'], ['improve', 'What should I improve tomorrow?']],
+};
+A.openJournal = el => { jPart = el.dataset.part; R.jDate = R.date || today(); go('journal'); };
+SCREENS.journal = () => {
+  const date = R.jDate || today();
+  const part = jPart || (new Date().getHours() < 14 ? 'morning' : 'evening');
+  const j = S.journal[date] || {};
+  const recent = Object.keys(S.journal).filter(d => d !== date && hasJournal(S.journal[d])).sort().reverse().slice(0, 20);
+  const html = `<div class="stack">
+    <div class="row"><button class="icon-btn" data-a="jShift" data-n="-1" aria-label="Previous day">${ICON.back}</button><button class="btn ghost grow" data-a="jShift" data-n="0">${date === today() ? 'Today · ' : ''}${fmtDate(date, { dow: true, year: date.slice(0, 4) !== today().slice(0, 4) })}</button><button class="icon-btn" data-a="jShift" data-n="1" aria-label="Next day" ${date >= today() ? 'disabled' : ''}>${ICON.chev}</button></div>
+    <div class="seg">${[['morning', 'Morning'], ['evening', 'Evening'], ['notes', 'Notes']].map(([p, l]) => `<button data-a="jPart" data-p="${p}" aria-pressed="${part === p}">${l}</button>`).join('')}</div>
+    ${part === 'notes' ? `<label class="f">Free notes, ideas, prayers, sermon notes${textArea('j_notes_text', j.notes, 'Write or dictate…', 'jInput')}</label>
+      <label class="f">Leadership reflection (optional)${textArea('j_notes_leader', j.leader, 'A conversation, a decision, how I led…', 'jInput')}</label>`
+      : PROMPTS[part].map(([k, q]) => `<label class="f"><span style="font-family:var(--serif);font-size:1.05rem;color:var(--navy)">${q}</span>${textArea(`j_${part}_${k}`, j[part]?.[k], '', 'jInput')}</label>`).join('')}
+    <p class="tiny faint">Saves as you type. Use the microphone to dictate. Keep employer-confidential details out.</p>
+  </div>
+  <section class="section"><div class="section-head"><h2>Reviews</h2></div>
+    <div class="row"><button class="btn block" data-a="newReview" data-t="weekly">Weekly</button><button class="btn block" data-a="newReview" data-t="monthly">Monthly</button><button class="btn block" data-a="newReview" data-t="quarterly">Quarterly</button></div>
+    <div class="list">${S.reviews.length ? S.reviews.slice().sort((a, b) => b.start.localeCompare(a.start)).slice(0, 12).map(r => `<button class="menu-item" data-a="openReview" data-id="${r.id}"><span class="grow"><b>${r.type[0].toUpperCase() + r.type.slice(1)} review</b><br><span class="small faint num">${fmtDate(r.start)} – ${fmtDate(r.end, { year: true })}</span></span>${ICON.chev.replace('<svg', '<svg class="chev"')}</button>`).join('') : empty('No reviews yet', 'Your Sunday weekly review builds a summary from what you actually recorded.')}</div>
+  </section>
+  <section class="section"><div class="section-head"><h2>Past entries</h2></div>
+    <div class="list">${recent.length ? recent.map(d => `<button class="menu-item" data-a="jGo" data-d="${d}"><span class="grow"><b>${fmtDate(d, { dow: true })}</b><br><span class="small faint">${esc(journalPreview(S.journal[d]).slice(0, 80))}</span></span></button>`).join('') : empty('Nothing yet', 'Entries you write appear here.')}</div>
+  </section>`;
+  return { title: 'Journal', html };
+};
+function hasJournal(j) { return j && (Object.values(j.morning || {}).some(Boolean) || Object.values(j.evening || {}).some(Boolean) || j.notes || j.leader); }
+function journalPreview(j) { return [j.morning?.matters, j.evening?.accomplished, j.notes, j.morning?.grateful].filter(Boolean)[0] || ''; }
+A.jShift = el => { const n = Number(el.dataset.n); R.jDate = n === 0 ? today() : addDays(R.jDate || today(), n); if (R.jDate > today()) R.jDate = today(); render(); };
+A.jPart = el => { jPart = el.dataset.p; render(); };
+A.jGo = el => { R.jDate = el.dataset.d; scrollTo(0, 0); render(); };
+ON.jInput = el => {
+  const date = R.jDate || today(); const [, part, key] = el.id.split('_');
+  const j = S.journal[date] = S.journal[date] || { id: date, date };
+  if (part === 'notes') { j[key === 'text' ? 'notes' : 'leader'] = el.value; }
+  else { j[part] = j[part] || {}; j[part][key] = el.value; }
+  touch(j); save('journal');
+};
+
+/* Facts computed from saved records only */
+function facts(start, end) {
+  const last = end > today() ? today() : end;
+  const dates = []; for (let d = start; d <= last; d = addDays(d, 1)) dates.push(d);
+  let planned = 0, done = 0, skipped = 0, restDays = 0, activeDays = 0;
+  const byP = {}; PILLARS.forEach(p => byP[p.id] = { planned: 0, done: 0 });
+  for (const d of dates) {
+    const s = dayStats(d); planned += s.planned; done += s.done; skipped += s.skipped;
+    if (S.days[d]?.mode === 'rest') restDays++;
+    tasksFor(d).filter(t => t.status !== 'skipped').forEach(t => { if (byP[t.pillar]) { byP[t.pillar].planned++; if (t.status === 'done') byP[t.pillar].done++; } });
+    if (s.done || hasJournal(S.journal[d]) || S.days[d]?.checkin) activeDays++;
+  }
+  const inR = x => x >= start && x <= end;
+  const logs = S.logs.filter(l => inR(l.date));
+  const lk = k => logs.filter(l => l.kind === k);
+  const checkins = dates.map(d => S.days[d]?.checkin).filter(Boolean);
+  const avg = k => { const v = checkins.map(c => c[k]).filter(x => x != null); return v.length ? Math.round(sum(v) / v.length * 10) / 10 : null; };
+  const lightsOut = S.tasks.filter(t => inR(t.date || '') && t.anchor && /^Lights out/.test(t.title) && t.status !== 'skipped');
+  return {
+    days: dates.length, activeDays, restDays, planned, done, skipped, completion: pct(done, planned), byPillar: byP,
+    workouts: lk('workout').length || S.tasks.filter(t => inR(t.date || '') && t.kind === 'workout' && t.status === 'done').length,
+    workoutMins: sum(lk('workout').map(l => l.mins)), keyboardMins: sum(lk('keyboard').map(l => l.mins)), tradingMins: sum(lk('trading').map(l => l.mins)),
+    drills: lk('comms').length, cpdHours: Math.round(sum(lk('cpd').map(l => l.mins)) / 6) / 10, cpdFormalHours: Math.round(sum(lk('cpd').filter(l => l.formal).map(l => l.mins)) / 6) / 10,
+    journalDays: dates.filter(d => hasJournal(S.journal[d])).length,
+    milestonesDone: S.milestones.filter(m => m.done && m.doneAt && inR(m.doneAt.slice(0, 10))).length,
+    avgSleep: avg('sleep'), avgEnergy: avg('energy'), checkins: checkins.length,
+    bedtime: lightsOut.length ? pct(lightsOut.filter(t => t.status === 'done').length, lightsOut.length) : null,
+  };
+}
+function suggestions(f) {
+  const out = [];
+  if (!f.planned) return ['Not enough recorded activity yet to suggest anything. Keep logging and check back next week.'];
+  PILLARS.forEach(p => { const b = f.byPillar[p.id]; if (p.id !== 'faith' && b.planned >= 3 && b.done / b.planned < 0.5) out.push(`${p.short}: ${b.done} of ${b.planned} planned items done. Consider planning fewer, fixed sessions next week rather than more.`); });
+  if (f.skipped > f.planned * 0.3) out.push('Many items were skipped. The plan may be too full for this season. Try trimming optional growth items.');
+  if (f.bedtime != null && f.bedtime < 60) out.push(`Bedtime kept on ${f.bedtime}% of nights. Moving the wind-down earlier by 15 minutes may help.`);
+  if (f.avgSleep != null && f.avgSleep < 6.5) out.push(`Average sleep ${f.avgSleep}h. Protect sleep before adding anything new.`);
+  if (f.completion != null && f.completion >= 85) out.push('Strong follow-through. You have room to add one stretch action next week if you want it.');
+  if (!f.drills) out.push('No communication drills recorded. One 10-minute drill is enough to keep the habit alive.');
+  if (!f.journalDays) out.push('No journal entries yet. A one-line evening answer counts.');
+  return out.length ? out : ['Steady period. Keep the same shape next week.'];
+}
+function periodFor(type) {
+  const t = today();
+  if (type === 'weekly') { const ws = weekStart(t); const s = dow(t) === 0 || dow(t) >= 5 ? ws : addDays(ws, -7); return { start: s, end: addDays(s, 6) }; }
+  if (type === 'monthly') { const first = monthKey(t) + '-01'; const s = pd(t).getDate() >= 25 ? first : addMonths(first, -1); return { start: s, end: addDays(addMonths(s, 1), -1) }; }
+  const q = quarterOf(t); const usePrev = daysBetween(t, q.end) > 14; const qq = usePrev ? quarterOf(addDays(q.start, -1)) : q; return { start: qq.start, end: qq.end };
+}
+A.newReview = el => {
+  const type = el.dataset.t, p = periodFor(type);
+  let r = S.reviews.find(x => x.type === type && x.start === p.start);
+  if (!r) { r = touch({ id: uid('rv'), type, ...p, self: {}, createdAt: nowIso() }); S.reviews.push(r); save('reviews'); }
+  go('journal', 'review', r.id, true);
+};
+A.openReview = el => go('journal', 'review', el.dataset.id, true);
+SCREENS.review = () => {
+  const r = S.reviews.find(x => x.id === R.arg); if (!r) { R.sub = null; return SCREENS.journal(); }
+  const f = facts(r.start, r.end), sg = suggestions(f), s = r.self || {};
+  r.facts = f; r.suggestions = sg; // snapshot kept for export/sync
+  const fl = (k, v) => `<div class="row between"><span class="muted">${k}</span><b class="num">${v ?? '—'}</b></div>`;
+  const html = `<div class="stack">
+    <div class="stack-sm"><span class="eyebrow">${r.type} review</span><h1>${fmtDate(r.start)} – ${fmtDate(r.end, { year: true })}</h1></div>
+    <div class="card stack-sm"><div class="row between"><h3>Facts</h3><span class="badge fact">From your records</span></div>
+      ${fl('Completion (excl. skips)', f.completion != null ? f.completion + '%' : null)}${fl('Done / planned', `${f.done} / ${f.planned}`)}${fl('Skipped on purpose', f.skipped)}${fl('Active days', `${f.activeDays} of ${f.days}`)}${fl('Rest days', f.restDays)}
+      ${fl('Workouts', f.workouts)}${fl('Keyboard practice', f.keyboardMins ? f.keyboardMins + ' min' : null)}${fl('Trading study', f.tradingMins ? f.tradingMins + ' min' : null)}${fl('Communication drills', f.drills)}${fl('CPD logged', f.cpdHours ? `${f.cpdHours} h (${f.cpdFormalHours} formal)` : null)}
+      ${fl('Journal days', f.journalDays)}${fl('Milestones achieved', f.milestonesDone)}${fl('Average sleep', f.avgSleep != null ? f.avgSleep + ' h' : null)}${fl('Average energy', f.avgEnergy != null ? f.avgEnergy + ' / 5' : null)}${fl('Bedtime kept', f.bedtime != null ? f.bedtime + '%' : null)}
+      <hr class="sep"><span class="eyebrow">By area</span>${PILLARS.map(p => { const b = f.byPillar[p.id]; return b.planned ? `<div class="row">${pillarDot(p.id)}<span class="grow small">${esc(p.short)}</span><span class="small num">${b.done}/${b.planned}</span></div>` : ''; }).join('') || '<span class="small faint">No planned items in this period.</span>'}
+    </div>
+    <div class="card stack"><div class="row between"><h3>Self-assessment</h3><span class="badge self">Self-reported</span></div>
+      <label class="f">Wins${textArea('rv_wins', s.wins, '', 'rvInput')}</label>
+      <label class="f">Lessons and what to change${textArea('rv_lessons', s.lessons, '', 'rvInput')}</label>
+      <label class="f">Faith, marriage and service: what did I notice? (reflection, not a score)${textArea('rv_faith', s.faith, '', 'rvInput')}</label>
+      ${r.type === 'weekly' ? `<span class="eyebrow">Communication this week</span>
+        <label class="f">Clarity</label>${scaleInput('rv_clarity', s.clarity)}
+        <label class="f">Confidence</label>${scaleInput('rv_confidence', s.confidence)}
+        <label class="f">Natural conversation</label>${scaleInput('rv_natural', s.natural)}` : ''}
+      <label class="f">Main focus for the next ${r.type === 'weekly' ? 'week' : r.type === 'monthly' ? 'month' : 'quarter'}${textArea('rv_next', s.next, '', 'rvInput')}</label>
+    </div>
+    <div class="card stack-sm"><div class="row between"><h3>Suggestions</h3><span class="badge ai">Generated by rules</span></div>
+      ${sg.map(x => `<p class="small">• ${esc(x)}</p>`).join('')}
+      <p class="tiny faint">Suggestions are prompts for thought, not facts. Adjust targets freely.</p></div>
+  </div>`;
+  return { title: 'Review', html, after: () => $$('.scale[id^="rv_"]').forEach(sc => sc.addEventListener('scale', () => { r.self = r.self || {}; r.self[sc.id.slice(3)] = Number(sc.dataset.value); touch(r); save('reviews'); })) };
+};
+ON.rvInput = el => { const r = S.reviews.find(x => x.id === R.arg); r.self = r.self || {}; r.self[el.id.slice(3)] = el.value; touch(r); save('reviews'); };
+
+/* ===================== More: areas, logs, routines, settings ===================== */
+const menuItem = (a, icon, title, sub, extra = '') => `<button class="menu-item" data-a="${a}" ${extra}><span class="mi-ic">${ICON[icon]}</span><span class="grow"><b>${esc(title)}</b>${sub ? `<br><span class="small faint">${esc(sub)}</span>` : ''}</span>${ICON.chev.replace('<svg', '<svg class="chev"')}</button>`;
+SCREENS.more = () => ({
+  title: 'More', html: `<div class="stack">
+  <span class="eyebrow">Areas</span>
+  <div class="list">
+    ${menuItem('nav', 'brief', 'Professional development', 'Competency confidence, CPD, learning notes', 'data-to="pro"')}
+    ${menuItem('nav', 'home', 'Business & property', 'PMRes, Property Is One, Origin, Ghana', 'data-to="biz"')}
+    ${menuItem('nav', 'pound', 'Personal finance', 'Savings, debt, investment capital, readiness', 'data-to="finance"')}
+    ${menuItem('nav', 'log', 'Activity logs', 'Workouts, keyboard, trading, communication drills', 'data-to="logs"')}
+  </div>
+  <span class="eyebrow">Planning</span>
+  <div class="list">
+    ${menuItem('nav', 'repeat', 'Routines', 'Weekly rhythm the daily planner builds from', 'data-to="routines"')}
+    ${menuItem('nav', 'cal', 'Calendar import', 'Add events from an .ics file', 'data-to="calendar"')}
+  </div>
+  <span class="eyebrow">System</span>
+  <div class="list">
+    ${menuItem('nav', 'cloud', 'Backup, export & Notion', S.sync.lastNotion ? 'Last Notion sync ' + new Date(S.sync.lastNotion).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' }) : 'Not synced yet', 'data-to="data"')}
+    ${menuItem('nav', 'gear', 'Settings', 'Schedule, theme, PIN lock', 'data-to="settings"')}
+    ${menuItem('nav', 'phone', 'Add to iPhone home screen', 'Install as an app', 'data-to="install"')}
+  </div>
+  <p class="tiny faint" style="text-align:center">ONE LIFE OS ${APP_VERSION} · Data stays on this device unless you back it up or sync it.</p></div>`,
+});
+A.nav = el => go(R.tab, el.dataset.to, el.dataset.arg || null, true);
+
+/* ---------- Professional ---------- */
+SCREENS.pro = () => {
+  const y = today().slice(0, 4);
+  const cpd = S.logs.filter(l => l.kind === 'cpd' && l.date.startsWith(y));
+  const hrs = Math.round(sum(cpd.map(l => l.mins)) / 6) / 10, formal = Math.round(sum(cpd.filter(l => l.formal).map(l => l.mins)) / 6) / 10;
+  return { title: 'Professional', html: `<div class="stack">
+    <div class="card stack-sm"><div class="row between"><h3>CPD ${y}</h3><button class="btn sm" data-a="logKind" data-k="cpd">${ICON.plus} Log CPD</button></div>
+      <div class="row"><span class="grow small muted">Total</span><b class="num">${hrs} / 20 h</b></div><div class="bar"><i style="width:${clamp(hrs / 20 * 100, 0, 100)}%"></i></div>
+      <div class="row"><span class="grow small muted">Formal</span><b class="num">${formal} / 10 h</b></div><div class="bar"><i style="width:${clamp(formal / 10 * 100, 0, 100)}%;background:var(--p-pro)"></i></div>
+      <p class="tiny faint">RICS CPD is recorded per calendar year. Check the current RICS requirements and record officially on the RICS site.</p></div>
+    <section class="section"><div class="section-head"><h2>Competency confidence</h2><button class="link" data-a="addComp">+ Add</button></div>
+      <p class="small muted">Self-assessed, 1 (aware) to 5 (could teach it). Update monthly and attach evidence of learning.</p>
+      <div class="list">${S.competencies.map(c => `<button class="menu-item" data-a="openComp" data-id="${c.id}"><span class="grow"><b style="font-weight:500">${esc(c.name)}</b><br><span class="small faint">${c.evidence.length} evidence notes${c.history.length ? ' · updated ' + fmtDate(c.history[c.history.length - 1].date) : ''}</span></span>
+        <span class="row" style="gap:3px" aria-label="Confidence ${c.confidence ?? 'not rated'}">${[1, 2, 3, 4, 5].map(i => `<i class="dot" style="width:8px;height:8px;background:${c.confidence >= i ? 'var(--p-pro)' : 'var(--surface-2)'}"></i>`).join('')}</span></button>`).join('') || empty('No competencies', 'Add the skills you want to grow.')}</div></section>
+    <section class="section"><div class="section-head"><h2>Learning notes</h2></div>
+      <div class="list">${cpd.slice().reverse().slice(0, 10).map(l => `<div class="task"><span class="grow"><span class="ttl">${esc(l.topic || 'CPD')}</span><br><span class="meta num">${fmtDate(l.date)} · ${l.mins} min${l.formal ? ' · formal' : ''}</span>${l.note ? `<br><span class="small muted">${esc(l.note)}</span>` : ''}</span></div>`).join('') || empty('No notes yet', 'Log CPD or a learning note after study or a useful day at work. No case details.')}</div></section>
+  </div>` };
+};
+A.openComp = el => {
+  const c = S.competencies.find(x => x.id === el.dataset.id);
+  openSheet(c.name, `<label class="f">Confidence now</label>${scaleInput('compConf', c.confidence, 5, ['Aware', 'Learning', 'Competent', 'Confident', 'Could teach it'])}
+    <label class="f">Evidence of learning (optional)${textArea('compEv', '', 'What did you study, practise or achieve?')}</label>
+    <button class="btn primary block" data-a="saveComp" data-id="${c.id}">Save</button>
+    ${c.evidence.length ? `<span class="eyebrow">Evidence</span><div class="list">${c.evidence.slice().reverse().map(e => `<div class="task"><span class="grow small"><b class="num">${fmtDate(e.date)}</b> ${esc(e.text)}</span></div>`).join('')}</div>` : ''}
+    ${c.history.length ? `<p class="small muted">History: ${c.history.map(h => `${fmtDate(h.date)} → ${h.value}`).join(' · ')}</p>` : ''}
+    <input type="text" id="compName" value="${esc(c.name)}" aria-label="Rename competency">
+    <button class="btn ghost danger block" data-a="delComp" data-id="${c.id}">${ICON.trash} Remove competency</button>`);
+};
+A.saveComp = el => {
+  const c = S.competencies.find(x => x.id === el.dataset.id), v = scaleVal('compConf'), ev = val('compEv').trim();
+  if (v && v !== c.confidence) { c.confidence = v; const last = c.history[c.history.length - 1]; if (last && last.date === today()) last.value = v; else c.history.push({ date: today(), value: v }); }
+  if (ev) c.evidence.push({ date: today(), text: ev });
+  c.name = val('compName').trim() || c.name; touch(c); save('competencies'); closeSheet(); render();
+};
+A.delComp = el => { S.competencies = S.competencies.filter(x => x.id !== el.dataset.id); save('competencies'); closeSheet(); render(); };
+A.addComp = () => openSheet('New competency', `<input type="text" id="newComp" placeholder="e.g. Compulsory purchase basics"><button class="btn primary block" data-a="saveNewComp">Add</button>`);
+A.saveNewComp = () => { const n = val('newComp').trim(); if (!n) return; S.competencies.push(touch({ id: uid('c'), name: n, confidence: null, history: [], evidence: [] })); save('competencies'); closeSheet(); render(); };
+
+/* ---------- Business workspaces ---------- */
+SCREENS.biz = () => ({ title: 'Business & property', html: `<div class="stack">
+  <p class="small muted">Track approved activity only. Keep business work separate from DVS duties and confirm outside-employment rules with your employer.</p>
+  <div class="list">${WORKSPACES.map(w => { const ps = S.projects.filter(p => p.ws === w.id); const ms = ps.flatMap(p => p.milestones); return menuItem('nav', 'home', w.name, `${w.blurb} · ${ps.length} projects · ${ms.filter(m => m.done).length}/${ms.length} milestones`, `data-to="ws" data-arg="${w.id}"`); }).join('')}</div></div>` });
+SCREENS.ws = () => {
+  const w = WORKSPACES.find(x => x.id === R.arg); const ps = S.projects.filter(p => p.ws === w.id);
+  const goals = S.goals.filter(g => g.ws === w.id);
+  return { title: w.name, html: `<div class="stack"><p class="small muted">${esc(w.blurb)}</p>
+    ${goals.length ? `<span class="eyebrow">Linked goals</span><div class="list">${goals.map(goalCard).join('')}</div>` : ''}
+    <div class="section-head"><h2>Projects</h2><button class="link" data-a="addProject">+ Add</button></div>
+    ${ps.map(p => { const d = p.milestones.filter(m => m.done).length; return `<div class="card stack-sm"><div class="row between"><h3>${esc(p.title)}</h3><span class="badge">${esc(p.status)}</span></div>
+      <div class="row"><span class="bar grow"><i style="width:${pct(d, p.milestones.length) || 0}%;background:var(--p-biz)"></i></span><span class="small num faint">${d}/${p.milestones.length}</span></div>
+      ${p.next ? `<p class="small"><b>Next:</b> ${esc(p.next)}</p>` : ''}
+      <div class="list">${p.milestones.map(m => `<div class="task ${m.done ? 'done' : ''}"><button class="check" data-a="toggleProjMs" data-p="${p.id}" data-m="${m.id}" aria-label="Toggle">${ICON.check}</button><span class="grow ttl">${esc(m.title)}</span></div>`).join('')}</div>
+      <div class="row wrap"><button class="btn sm" data-a="editProject" data-id="${p.id}">Edit</button><button class="btn sm" data-a="projLog" data-id="${p.id}" data-f="decisions">+ Decision</button><button class="btn sm" data-a="projLog" data-id="${p.id}" data-f="learning">+ Learning</button></div>
+      ${p.decisions.length ? `<details><summary>Decisions (${p.decisions.length})</summary>${p.decisions.slice().reverse().map(x => `<p class="small"><b class="num">${fmtDate(x.date, { year: true })}</b> ${esc(x.text)}</p>`).join('')}</details>` : ''}
+      ${p.learning.length ? `<details><summary>Learning (${p.learning.length})</summary>${p.learning.slice().reverse().map(x => `<p class="small"><b class="num">${fmtDate(x.date, { year: true })}</b> ${esc(x.text)}</p>`).join('')}</details>` : ''}
+    </div>`; }).join('') || `<div class="list">${empty('No projects', 'Add a project to track milestones and decisions.')}</div>`}</div>` };
+};
+A.toggleProjMs = el => { const p = S.projects.find(x => x.id === el.dataset.p), m = p.milestones.find(x => x.id === el.dataset.m); m.done = !m.done; m.doneAt = m.done ? nowIso() : null; touch(p); save('projects'); render(); };
+const projForm = (p = {}) => `<label class="f">Project<input type="text" id="pjTitle" value="${esc(p.title || '')}"></label>
+  <label class="f">Status<select id="pjStatus">${['idea', 'active', 'on hold', 'complete'].map(s => `<option ${p.status === s ? 'selected' : ''}>${s}</option>`).join('')}</select></label>
+  <label class="f">Next action<input type="text" id="pjNext" value="${esc(p.next || '')}"></label>
+  <label class="f">Milestones (one per line)<textarea id="pjMs">${esc((p.milestones || []).map(m => m.title).join('\n'))}</textarea></label>`;
+A.addProject = () => openSheet('New project', projForm({ status: 'active' }) + `<button class="btn primary block" data-a="saveProject">Create</button>`);
+A.editProject = el => openSheet('Edit project', projForm(S.projects.find(x => x.id === el.dataset.id)) + `<button class="btn primary block" data-a="saveProject" data-id="${el.dataset.id}">Save</button><button class="btn ghost danger block" data-a="delProject" data-id="${el.dataset.id}">${ICON.trash} Delete project</button>`);
+A.saveProject = el => {
+  let p = el.dataset.id && S.projects.find(x => x.id === el.dataset.id);
+  if (!p) { p = { id: uid('p'), ws: R.arg, milestones: [], decisions: [], learning: [], notes: '' }; S.projects.push(p); }
+  const titles = val('pjMs').split('\n').map(s => s.trim()).filter(Boolean);
+  p.milestones = titles.map(t => p.milestones.find(m => m.title === t) || { id: uid('pm'), title: t, done: false });
+  Object.assign(p, { title: val('pjTitle').trim() || 'Untitled project', status: val('pjStatus'), next: val('pjNext') });
+  touch(p); save('projects'); closeSheet(); render();
+};
+A.delProject = el => { S.projects = S.projects.filter(x => x.id !== el.dataset.id); save('projects'); closeSheet(); render(); };
+A.projLog = el => openSheet(el.dataset.f === 'decisions' ? 'Record a decision' : 'Business learning', `${textArea('pjLogText', '', el.dataset.f === 'decisions' ? 'What was decided, and why?' : 'What did you learn?')}<button class="btn primary block" data-a="saveProjLog" data-id="${el.dataset.id}" data-f="${el.dataset.f}">Save</button>`);
+A.saveProjLog = el => { const t = val('pjLogText').trim(); if (!t) return; const p = S.projects.find(x => x.id === el.dataset.id); p[el.dataset.f].push({ date: today(), text: t }); touch(p); save('projects'); closeSheet(); render(); };
+
+/* ---------- Finance (user-entered only) ---------- */
+function finCurrent(t) { const e = S.finance.entries.filter(x => x.targetId === t.id).sort((a, b) => a.date.localeCompare(b.date)); return e.length ? e[e.length - 1].value : t.start; }
+function finProgress(t) { const cur = finCurrent(t); if (t.target == null || t.start == null || cur == null) return null; const span = t.target - t.start; if (!span) return 100; return clamp(Math.round((cur - t.start) / span * 100), 0, 100); }
+SCREENS.finance = () => ({ title: 'Personal finance', html: `<div class="stack">
+  <p class="small muted">Every figure here is entered by you. Nothing is estimated or invented. Debt targets count down towards your target.</p>
+  ${S.finance.targets.length ? S.finance.targets.map(t => { const p = finProgress(t), cur = finCurrent(t); return `<div class="card stack-sm"><div class="row between"><h3>${esc(t.name)}</h3><span class="badge">${esc(t.kind)}</span></div>
+    <div class="row between small"><span class="muted">Start ${money(t.start)}</span><b class="num">${money(cur)}</b><span class="muted">Target ${money(t.target)}</span></div>
+    <div class="bar"><i style="width:${p ?? 0}%;background:var(--p-biz)"></i></div><span class="tiny faint">${p ?? 0}% of the way · ${S.finance.entries.filter(e => e.targetId === t.id).length} updates</span>
+    <div class="row"><button class="btn sm" data-a="finUpdate" data-id="${t.id}">Update balance</button><button class="btn sm ghost" data-a="finEdit" data-id="${t.id}">Edit</button></div></div>`; }).join('')
+    : `<div class="list">${empty('No targets yet', 'Add a target with your own figures.')}</div>`}
+  <span class="eyebrow">Add a target</span>
+  <div class="chips">${[['Emergency fund', 'savings'], ['Debt reduction', 'debt'], ['Investment capital', 'investment'], ['Development fund', 'development']].map(([n, k]) => `<button class="chip" data-a="finNew" data-n="${n}" data-k="${k}">${ICON.plus.replace('<svg', '<svg width="14" height="14"')} ${n}</button>`).join('')}<button class="chip" data-a="finNew" data-n="" data-k="savings">Custom</button></div></div>` });
+const finForm = (t = {}) => `<label class="f">Name<input type="text" id="fnName" value="${esc(t.name || '')}"></label>
+  <label class="f">Type<select id="fnKind">${['savings', 'debt', 'investment', 'development'].map(k => `<option ${t.kind === k ? 'selected' : ''}>${k}</option>`).join('')}</select></label>
+  <div class="field-row"><label class="f">Starting figure (£)<input type="number" inputmode="decimal" id="fnStart" value="${t.start ?? ''}"></label><label class="f">Target (£)<input type="number" inputmode="decimal" id="fnTarget" value="${t.target ?? ''}"></label></div>
+  <label class="f">Target date<input type="date" id="fnDate" value="${t.date || ''}"></label>`;
+A.finNew = el => openSheet('New financial target', finForm({ name: el.dataset.n, kind: el.dataset.k }) + `<p class="tiny faint">For debt, the target is usually 0.</p><button class="btn primary block" data-a="finSave">Create</button>`);
+A.finEdit = el => openSheet('Edit target', finForm(S.finance.targets.find(x => x.id === el.dataset.id)) + `<button class="btn primary block" data-a="finSave" data-id="${el.dataset.id}">Save</button><button class="btn ghost danger block" data-a="finDel" data-id="${el.dataset.id}">${ICON.trash} Delete target and history</button>`);
+A.finSave = el => {
+  const num = id => val(id) === '' ? null : Number(val(id));
+  if (num('fnStart') == null || num('fnTarget') == null) { toast('Enter a starting figure and a target'); return; }
+  let t = el.dataset.id && S.finance.targets.find(x => x.id === el.dataset.id);
+  if (!t) { t = { id: uid('f') }; S.finance.targets.push(t); }
+  Object.assign(t, { name: val('fnName').trim() || 'Target', kind: val('fnKind'), start: num('fnStart'), target: num('fnTarget'), date: val('fnDate') }); touch(t);
+  save('finance'); closeSheet(); render();
+};
+A.finDel = el => { S.finance.targets = S.finance.targets.filter(x => x.id !== el.dataset.id); S.finance.entries = S.finance.entries.filter(x => x.targetId !== el.dataset.id); save('finance'); closeSheet(); render(); };
+A.finUpdate = el => openSheet('Update balance', `<div class="field-row"><label class="f">Date<input type="date" id="feDate" value="${today()}"></label><label class="f">Balance (£)<input type="number" inputmode="decimal" id="feVal"></label></div><button class="btn primary block" data-a="finEntry" data-id="${el.dataset.id}">Save</button>`, { after: b => setTimeout(() => $('#feVal', b).focus(), 250) });
+A.finEntry = el => { if (val('feVal') === '') return; S.finance.entries.push({ id: uid('fe'), targetId: el.dataset.id, date: val('feDate') || today(), value: Number(val('feVal')) }); save('finance'); closeSheet(); render(); toast('Balance recorded'); };
+
+/* ---------- Activity logs ---------- */
+const LOG_FIELDS = {
+  workout: { title: 'Workout', chips: ['Strength', 'Cardio', 'Walk', 'Sport', 'Mobility'], rate: 'Effort' },
+  keyboard: { title: 'Keyboard practice', chips: ['Chord vocabulary', 'Song learning', 'Ear training', 'Musical application', 'Retention review'], rate: 'How well it stuck', extra: [['chords', 'New chords or voicings'], ['song', 'Song(s)']] },
+  trading: { title: 'Trading study', chips: ['Learning', 'Chart analysis', 'Structure recognition', 'Risk management', 'Practice (paper)'], rate: 'Understanding', note: 'Secondary, mastery-based learning. Not an income plan.' },
+  comms: { title: 'Communication drill', chips: ['2-minute talk', 'Explain it simply', 'Presentation practice', 'Stakeholder conversation', 'Active listening'], rate: 'Clarity' },
+  cpd: { title: 'CPD / learning note', chips: ['Course', 'Reading', 'Webinar', 'On-the-job learning', 'Mentoring'], rate: 'Usefulness', extra: [['topic', 'Topic']], formal: true },
+};
+function openLog(kind, pre = {}) {
+  const f = LOG_FIELDS[kind];
+  openSheet(f.title, `${f.note ? `<p class="small muted">${f.note}</p>` : ''}
+    <div class="field-row"><label class="f">Date<input type="date" id="lgDate" value="${pre.date || today()}"></label><label class="f">Minutes<input type="number" inputmode="numeric" id="lgMins" value="${pre.mins || ''}"></label></div>
+    <div class="chips" id="lgChips">${f.chips.map(c => `<button class="chip" data-a="lgChip" aria-pressed="false">${c}</button>`).join('')}</div>
+    ${(f.extra || []).map(([k, l]) => `<label class="f">${l}<input type="text" id="lg_${k}"></label>`).join('')}
+    ${f.formal ? toggleRow('lgFormal', 'Formal CPD', false, 'Structured learning with a defined outcome') : ''}
+    <label class="f">${f.rate}</label>${scaleInput('lgRate', null)}
+    <label class="f">Note (optional)${textArea('lgNote', '', kind === 'cpd' ? 'What did you learn? Non-confidential only.' : '')}</label>
+    <button class="btn primary block" data-a="saveLog" data-k="${kind}" data-task="${pre.taskId || ''}">Save</button>`);
+}
+A.lgChip = el => el.setAttribute('aria-pressed', el.getAttribute('aria-pressed') !== 'true');
+A.logKind = el => openLog(el.dataset.k);
+A.saveLog = el => {
+  const k = el.dataset.k, mins = Number(val('lgMins')) || 0;
+  const l = { id: uid('l'), kind: k, pillar: { workout: 'health', keyboard: 'skills', trading: 'skills', comms: 'comms', cpd: 'pro' }[k], date: val('lgDate') || today(), mins, tags: $$('#lgChips [aria-pressed="true"]').map(c => c.textContent), rating: scaleVal('lgRate'), note: val('lgNote'), taskId: el.dataset.task || null };
+  (LOG_FIELDS[k].extra || []).forEach(([x]) => l[x] = val('lg_' + x));
+  if (LOG_FIELDS[k].formal) l.formal = val('lgFormal');
+  S.logs.push(touch(l)); save('logs');
+  if (!l.taskId) { const t = S.tasks.find(t => t.date === l.date && t.kind === k && t.status === 'open'); if (t) { t.status = 'done'; t.doneAt = nowIso(); touch(t); save('tasks'); } }
+  closeSheet(); render(); toast('Logged');
+};
+SCREENS.logs = () => {
+  const recent = S.logs.slice().sort((a, b) => b.date.localeCompare(a.date)).slice(0, 30);
+  const kb = S.logs.filter(l => l.kind === 'keyboard');
+  const chords = [...new Set(kb.flatMap(l => (l.chords || '').split(',').map(s => s.trim()).filter(Boolean)))];
+  const songs = [...new Set(kb.map(l => (l.song || '').trim()).filter(Boolean))];
+  return { title: 'Activity logs', html: `<div class="stack">
+    <div class="list">${Object.entries(LOG_FIELDS).map(([k, f]) => `<button class="menu-item" data-a="logKind" data-k="${k}"><span class="mi-ic">${ICON[k === 'keyboard' ? 'music' : k === 'cpd' ? 'book' : k === 'comms' ? 'people' : 'log']}</span><span class="grow"><b>${f.title}</b><br><span class="small faint">${S.logs.filter(l => l.kind === k).length} entries</span></span>${ICON.plus.replace('<svg', '<svg class="chev"')}</button>`).join('')}</div>
+    <div class="card stack-sm"><h3>Keyboard vocabulary</h3><p class="small"><b>${chords.length}</b> chords or voicings logged${chords.length ? ': ' + esc(chords.slice(-12).join(', ')) : ''}</p><p class="small"><b>${songs.length}</b> songs${songs.length ? ': ' + esc(songs.slice(-8).join(', ')) : ''}</p></div>
+    <section class="section"><h2>Recent</h2><div class="list">${recent.map(l => `<div class="task"><span class="grow"><span class="ttl">${esc(LOG_FIELDS[l.kind]?.title || l.kind)}${l.tags?.length ? ' · ' + esc(l.tags.join(', ')) : ''}</span><br><span class="meta num">${fmtDate(l.date, { dow: true })} · ${l.mins} min${l.rating ? ' · ' + l.rating + '/5' : ''}</span></span><button class="icon-btn" data-a="delLog" data-id="${l.id}" aria-label="Delete log">${ICON.trash}</button></div>`).join('') || empty('No logs yet', 'Completing a workout, practice or drill task offers a quick log.')}</div></section></div>` };
+};
+A.delLog = el => { const i = S.logs.findIndex(l => l.id === el.dataset.id); const [l] = S.logs.splice(i, 1); save('logs'); render(); toast('Log deleted', () => { S.logs.push(l); save('logs'); render(); }); };
+
+/* ---------- Routines ---------- */
+SCREENS.routines = () => ({ title: 'Routines', html: `<div class="stack">
+  <p class="small muted">The daily planner builds each day from these. Changes apply from the next day you open (or tap "Apply to today").</p>
+  ${[...PILLARS, { id: '', short: 'General' }].map(p => { const rs = S.routines.filter(r => r.pillar === p.id); return rs.length ? `<span class="eyebrow">${esc(p.short)}</span><div class="list">${rs.sort((a, b) => toMin(a.time) - toMin(b.time)).map(r => `<button class="menu-item" data-a="editRoutine" data-id="${r.id}" style="${r.active ? '' : 'opacity:.5'}"><span class="grow"><b style="font-weight:500">${esc(r.title)}</b><br><span class="small faint num">${r.days.length === 7 ? 'Daily' : r.days.map(d => DOW[d]).join(' ')} · ${r.time || 'any time'}${r.dur ? ' · ' + r.dur + 'm' : ''}${r.essential ? ' · essential' : ''}${r.mvd ? ' · minimum day' : ''}${r.when !== 'any' ? ' · ' + r.when + ' days' : ''}</span></span></button>`).join('')}</div>` : ''; }).join('')}
+  <button class="btn block" data-a="editRoutine">${ICON.plus} Add routine</button>
+  <button class="btn block ghost" data-a="applyToday">Apply to today</button></div>` });
+A.editRoutine = el => {
+  const r = (el.dataset.id && S.routines.find(x => x.id === el.dataset.id)) || { days: [1, 2, 3, 4, 5], time: '', dur: 20, when: 'any', active: true, pillar: '' };
+  openSheet(r.id ? 'Edit routine' : 'New routine', `<input type="text" id="rtTitle" value="${esc(r.title || '')}" placeholder="e.g. Read a valuation case study">
+    <div class="chips" id="rtDays">${[1, 2, 3, 4, 5, 6, 0].map(d => `<button class="chip" data-a="lgChip" data-d="${d}" aria-pressed="${r.days.includes(d)}">${DOW[d]}</button>`).join('')}</div>
+    <div class="field-row"><label class="f">Time<input type="time" id="rtTime" value="${r.time || ''}"></label><label class="f">Minutes<input type="number" id="rtDur" inputmode="numeric" value="${r.dur ?? ''}"></label></div>
+    <div class="field-row"><label class="f">Area${pillarSelect('rtPillar', r.pillar)}</label><label class="f">Only on<select id="rtWhen">${[['any', 'Any day'], ['workday', 'Work days'], ['office', 'Office days'], ['remote', 'Remote days']].map(([v, l]) => `<option value="${v}" ${r.when === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label></div>
+    <label class="f">Offer a quick log for<select id="rtKind"><option value="">Nothing</option>${Object.entries(LOG_FIELDS).map(([k, f]) => `<option value="${k}" ${r.kind === k ? 'selected' : ''}>${f.title}</option>`).join('')}</select></label>
+    ${toggleRow('rtEss', 'Essential commitment', r.essential)}${toggleRow('rtMvd', 'Keep on a Minimum Viable Day', r.mvd)}${toggleRow('rtAnchor', 'Daily anchor (not a top-three candidate)', r.anchor)}${toggleRow('rtActive', 'Active', r.active)}
+    <button class="btn primary block" data-a="saveRoutine" data-id="${r.id || ''}">Save</button>
+    ${r.id ? `<button class="btn ghost danger block" data-a="delRoutine" data-id="${r.id}">${ICON.trash} Delete routine</button>` : ''}`);
+};
+A.saveRoutine = el => {
+  let r = el.dataset.id && S.routines.find(x => x.id === el.dataset.id);
+  if (!r) { r = { id: uid('r') }; S.routines.push(r); }
+  Object.assign(r, { title: val('rtTitle').trim() || 'Routine', days: $$('#rtDays [aria-pressed="true"]').map(b => Number(b.dataset.d)), time: val('rtTime') || null, dur: Number(val('rtDur')) || 0, pillar: val('rtPillar'), when: val('rtWhen'), kind: val('rtKind'), essential: val('rtEss'), mvd: val('rtMvd'), anchor: val('rtAnchor'), active: val('rtActive') });
+  save('routines'); closeSheet(); render(); toast('Routine saved');
+};
+A.delRoutine = el => { S.routines = S.routines.filter(x => x.id !== el.dataset.id); save('routines'); closeSheet(); render(); };
+A.applyToday = () => {
+  const d = today();
+  S.tasks = S.tasks.filter(t => !(t.date === d && t.source === 'routine' && t.status === 'open'));
+  const day = getDay(d); day.generated = false; generateDay(d); save('tasks', 'days'); toast('Today rebuilt from routines (completed items kept)');
+};
+
+/* ---------- Calendar import (.ics) ---------- */
+SCREENS.calendar = () => {
+  const up = S.events.filter(e => e.date >= today()).sort((a, b) => (a.date + (a.start || '')).localeCompare(b.date + (b.start || ''))).slice(0, 30);
+  return { title: 'Calendar import', html: `<div class="stack">
+    <p class="small muted">Export a calendar as an .ics file (from Outlook, Google or Apple Calendar) and import it here. Events show on Today's timeline. Only events from the past week to four months ahead are kept. Repeating events import their first occurrence only. Don't import a work calendar that holds confidential details.</p>
+    <label class="btn primary block" for="icsIn">${ICON.cal} Choose .ics file</label><input type="file" id="icsIn" accept=".ics,text/calendar" data-onchange="icsFile" hidden>
+    <div class="list">${up.map(e => `<div class="task"><span class="grow"><span class="ttl">${esc(e.title)}</span><br><span class="meta num">${fmtDate(e.date, { dow: true })}${e.start ? ' · ' + e.start + (e.end ? '–' + e.end : '') : ' · all day'}</span></span></div>`).join('') || empty('No upcoming events', 'Imported events appear here.')}</div>
+    ${S.events.length ? `<button class="btn ghost danger block" data-a="clearEvents">Remove all imported events</button>` : ''}</div>` };
+};
+ON.icsFile = async el => {
+  const f = el.files[0]; if (!f) return;
+  const txt = (await f.text()).replace(/\r?\n[ \t]/g, '');
+  const evs = []; const lo = addDays(today(), -7), hi = addDays(today(), 120);
+  for (const block of txt.split('BEGIN:VEVENT').slice(1)) {
+    const get = k => { const m = block.match(new RegExp('^' + k + '(;[^:]*)?:(.*)$', 'm')); return m ? { params: m[1] || '', v: m[2].trim() } : null; };
+    const s = get('DTSTART'), e = get('DTEND'), sum = get('SUMMARY'); if (!s) continue;
+    const parse = x => { if (!x) return null; const v = x.v; if (/^\d{8}$/.test(v)) return { date: `${v.slice(0, 4)}-${v.slice(4, 6)}-${v.slice(6, 8)}`, time: null };
+      const m = v.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})/); if (!m) return null;
+      if (v.endsWith('Z')) { const d = new Date(Date.UTC(+m[1], m[2] - 1, +m[3], +m[4], +m[5])); return { date: ds(d), time: `${pad(d.getHours())}:${pad(d.getMinutes())}` }; }
+      return { date: `${m[1]}-${m[2]}-${m[3]}`, time: `${m[4]}:${m[5]}` }; };
+    const ps = parse(s), pe = parse(e); if (!ps || ps.date < lo || ps.date > hi) continue;
+    evs.push({ id: uid('e'), date: ps.date, start: ps.time, end: pe && pe.date === ps.date ? pe.time : null, title: (sum?.v || 'Event').replace(/\\,/g, ',').replace(/\\n/g, ' ') });
+  }
+  S.events = S.events.filter(x => x.date < lo).concat(evs); save('events'); render(); toast(`${evs.length} events imported`);
+};
+A.clearEvents = () => { S.events = []; save('events'); render(); };
+
+/* ---------- Settings ---------- */
+SCREENS.settings = () => { const s = S.settings; return { title: 'Settings', html: `<div class="stack">
+  <div class="card stack"><h3>You</h3>
+    <div class="field-row"><label class="f">Your name<input type="text" id="stName" value="${esc(s.name || '')}"></label><label class="f">Wife's name<input type="text" id="stWife" value="${esc(s.wifeName || '')}"></label></div></div>
+  <div class="card stack"><h3>Week shape</h3>
+    <div class="field-row"><label class="f">Wake<input type="time" id="stWake" value="${s.wake}"></label><label class="f">Bedtime target<input type="time" id="stBed" value="${s.bedtime}"></label></div>
+    <div class="field-row"><label class="f">Work starts<input type="time" id="stWs" value="${s.workStart}"></label><label class="f">Work ends<input type="time" id="stWe" value="${s.workEnd}"></label></div>
+    <label class="f">Usual office days</label><div class="chips" id="stOffice">${[1, 2, 3, 4, 5].map(d => `<button class="chip" data-a="lgChip" data-d="${d}" aria-pressed="${(s.officeDays || []).includes(d)}">${DOW[d]}</button>`).join('')}</div>
+    <label class="f">Commute each way (minutes)<input type="number" id="stCommute" inputmode="numeric" value="${s.commute ?? 0}"></label>
+    <p class="tiny faint">Bedtime and commitments live in Routines. Changing them here updates the planner's work blocks.</p></div>
+  <div class="card stack"><h3>Appearance</h3><div class="seg">${[['auto', 'Automatic'], ['light', 'Light'], ['dark', 'Dark']].map(([v, l]) => `<button data-a="setTheme" data-v="${v}" aria-pressed="${(s.theme || 'auto') === v}">${l}</button>`).join('')}</div></div>
+  <div class="card stack"><h3>Privacy lock</h3><p class="small muted">${s.pinHash ? 'A PIN is required when the app opens.' : 'Add a 4-digit PIN that is asked for when the app opens.'}</p>
+    <button class="btn block" data-a="setPin">${s.pinHash ? 'Change PIN' : 'Set a PIN'}</button>${s.pinHash ? '<button class="btn ghost block" data-a="removePin">Remove PIN</button>' : ''}</div>
+  <div class="card stack"><h3>Year</h3><label class="f">Year starts on<input type="date" id="stYear" value="${yearStart()}"></label><p class="tiny faint">Quarters run in three-month blocks from this date. The plan continues into later years automatically.</p></div>
+  <button class="btn primary block" data-a="saveSettings">Save settings</button>
+  <div class="card stack"><h3>Delete everything</h3><p class="small muted">Removes all data on this device. Notion and cloud backups are not touched. Type DELETE to confirm.</p><input type="text" id="delConfirm" autocomplete="off" placeholder="DELETE"><button class="btn danger block" data-a="wipe">Delete all data on this device</button></div></div>` }; };
+A.saveSettings = () => {
+  const s = S.settings;
+  Object.assign(s, { name: val('stName').trim() || s.name, wifeName: val('stWife').trim(), wake: val('stWake'), bedtime: val('stBed'), workStart: val('stWs'), workEnd: val('stWe'), commute: Number(val('stCommute')) || 0, officeDays: $$('#stOffice [aria-pressed="true"]').map(b => Number(b.dataset.d)), yearStart: val('stYear') || s.yearStart });
+  save('settings'); toast('Settings saved'); render();
+};
+A.setTheme = el => { S.settings.theme = el.dataset.v; save('settings'); applyTheme(); render(); };
+A.wipe = async () => {
+  if (val('delConfirm') !== 'DELETE') { toast('Type DELETE to confirm'); return; }
+  try { IDB.db && IDB.db.close(); } catch (e) { }
+  await new Promise(r => { const q = indexedDB.deleteDatabase('one-life-os'); q.onsuccess = q.onerror = q.onblocked = () => r(); });
+  try { localStorage.clear(); } catch (e) { }
+  location.reload();
+};
+
+/* ---------- Install instructions ---------- */
+SCREENS.install = () => ({ title: 'Add to iPhone', html: `<div class="stack"><div class="card stack-sm">
+  <h3>Install on your iPhone</h3>
+  <p>1. Open the app's web address in <b>Safari</b> (not Chrome or an in-app browser).</p>
+  <p>2. Tap the <b>Share</b> button (square with an arrow).</p>
+  <p>3. Scroll and tap <b>Add to Home Screen</b>, then <b>Add</b>.</p>
+  <p>4. Open ONE LIFE OS from the new home-screen icon. It runs full screen and works offline.</p>
+  <p class="small muted">Your data lives in the app's storage on this phone. Use the home-screen icon every time so you always see the same data. Opening the site in a Safari tab keeps a separate copy.</p>
+  <p class="small muted">${window.navigator.standalone || matchMedia('(display-mode: standalone)').matches ? 'You are using the installed app.' : 'You are in a browser tab right now.'}</p></div></div>` });
+
+/* ===================== Export, cloud backup and Notion sync ===================== */
+function tombstone(type, id) { if (S.sync.map[id]) { S.sync.deleted.push({ type, id, at: nowIso() }); save('sync'); } }
+function untombstone(id) { S.sync.deleted = S.sync.deleted.filter(d => d.id !== id); save('sync'); }
+async function deliverFile(name, text, mime) {
+  const blob = new Blob([text], { type: mime });
+  try {
+    const file = new File([blob], name, { type: mime });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: name }); return; }
+  } catch (e) { if (e.name === 'AbortError') return; }
+  const url = URL.createObjectURL(blob), a = document.createElement('a');
+  a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+const csvCell = v => { const s = Array.isArray(v) ? v.join('; ') : (v && typeof v === 'object') ? JSON.stringify(v) : String(v ?? ''); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
+function toCsv(rows, cols) { return [cols.join(','), ...rows.map(r => cols.map(c => csvCell(r[c])).join(','))].join('\n'); }
+function snapshot() { const o = { app: 'one-life-os', version: APP_VERSION, exportedAt: nowIso(), data: {} }; COLLECTIONS.forEach(k => o.data[k] = S[k]); const s = o.data.settings = { ...S.settings }; delete s.pinHash; delete s.pinSalt; delete s.backupPass; delete s.appKey; return o; }
+const stamp = () => today();
+A.exportJson = () => deliverFile(`one-life-os-backup-${stamp()}.json`, JSON.stringify(snapshot(), null, 1), 'application/json');
+A.exportCsv = el => {
+  const k = el.dataset.k; const gName = id => goalOf(id)?.title || '';
+  const sets = {
+    tasks: () => toCsv(S.tasks.map(t => ({ ...t, goal: gName(t.goalId), area: P[t.pillar]?.short || 'General' })), ['id', 'date', 'time', 'title', 'area', 'status', 'skipReason', 'essential', 'dur', 'goal', 'source', 'doneAt', 'notes']),
+    goals: () => toCsv(S.goals.map(g => ({ ...g, area: P[g.pillar]?.short, progressPct: goalProgress(g), evidence: (g.evidence || []).map(e => `${e.date}: ${e.text}`) })), ['id', 'cycle', 'area', 'title', 'status', 'progressPct', 'targetDate', 'why', 'criteria', 'deps', 'risks', 'evidence']),
+    milestones: () => toCsv(S.milestones.map(m => ({ ...m, goal: gName(m.goalId) })), ['id', 'goal', 'kind', 'period', 'title', 'due', 'done', 'doneAt']),
+    journal: () => toCsv(Object.values(S.journal).sort((a, b) => a.date.localeCompare(b.date)).map(j => ({ date: j.date, ...Object.fromEntries(Object.entries(j.morning || {}).map(([k, v]) => ['morning_' + k, v])), ...Object.fromEntries(Object.entries(j.evening || {}).map(([k, v]) => ['evening_' + k, v])), notes: j.notes, leadership: j.leader })), ['date', 'morning_matters', 'morning_grateful', 'morning_action', 'evening_accomplished', 'evening_learned', 'evening_challenged', 'evening_improve', 'notes', 'leadership']),
+    logs: () => toCsv(S.logs, ['id', 'date', 'kind', 'mins', 'tags', 'rating', 'formal', 'topic', 'chords', 'song', 'note']),
+    days: () => toCsv(Object.values(S.days).map(d => ({ date: d.date, mode: d.mode, workType: d.workType, focus: d.focus, sleep: d.checkin?.sleep, energy: d.checkin?.energy, recovery: d.checkin?.recovery, wellbeing: d.checkin?.wellbeing })), ['date', 'mode', 'workType', 'focus', 'sleep', 'energy', 'recovery', 'wellbeing']),
+  };
+  deliverFile(`one-life-os-${k}-${stamp()}.csv`, sets[k](), 'text/csv');
+};
+A.exportMd = () => {
+  let md = `# ONE LIFE OS export\n\nExported ${new Date().toLocaleString('en-GB')}\n\n## Goals\n`;
+  for (const g of S.goals) {
+    md += `\n### ${g.title}\n- Area: ${P[g.pillar]?.name}\n- Status: ${GOAL_STATUS[g.status]?.[0]} · ${goalProgress(g)}%\n- Target: ${g.targetDate}\n- Why: ${g.why}\n- Success: ${g.criteria}\n`;
+    S.milestones.filter(m => m.goalId === g.id).forEach(m => md += `- [${m.done ? 'x' : ' '}] ${m.kind === 'quarter' ? m.period : fmtMonth(m.period)}: ${m.title}\n`);
+    (g.evidence || []).forEach(e => md += `- Evidence ${e.date}: ${e.text}\n`);
+  }
+  md += `\n## Journal\n`;
+  Object.values(S.journal).filter(hasJournal).sort((a, b) => a.date.localeCompare(b.date)).forEach(j => {
+    md += `\n### ${fmtLong(j.date)} ${j.date.slice(0, 4)}\n`;
+    PROMPTS.morning.concat(PROMPTS.evening).forEach(([k, q]) => { const v = j.morning?.[k] ?? j.evening?.[k]; if (v) md += `**${q}** ${v}\n\n`; });
+    if (j.notes) md += `**Notes** ${j.notes}\n\n`; if (j.leader) md += `**Leadership** ${j.leader}\n\n`;
+  });
+  md += `\n## Reviews\n`;
+  S.reviews.forEach(r => { const f = facts(r.start, r.end); md += `\n### ${r.type} review ${r.start} – ${r.end}\n**Facts:** completion ${f.completion ?? '—'}%, ${f.done}/${f.planned} done, ${f.workouts} workouts, ${f.journalDays} journal days.\n\n**Self-assessment:** ${Object.entries(r.self || {}).map(([k, v]) => `${k}: ${v}`).join('; ')}\n\n**Suggestions (rules-based):** ${suggestions(f).join(' ')}\n`; });
+  deliverFile(`one-life-os-${stamp()}.md`, md, 'text/markdown');
+};
+ON.importJson = async el => {
+  const f = el.files[0]; if (!f) return;
+  try { const o = JSON.parse(await f.text()); if (o.app !== 'one-life-os' || !o.data) throw new Error('Not a ONE LIFE OS backup'); confirmRestore(o, 'file'); }
+  catch (e) { toast('That file could not be read: ' + e.message); }
+};
+function confirmRestore(o, src) {
+  openSheet('Restore backup?', `<p>This replaces everything on this device with the backup from <b>${esc(new Date(o.exportedAt).toLocaleString('en-GB'))}</b> (${src}). Your PIN and connection keys stay as they are.</p><button class="btn danger block" data-a="doRestore">Replace data with backup</button>`);
+  A.doRestore = () => {
+    const keep = { pinHash: S.settings.pinHash, pinSalt: S.settings.pinSalt, appKey: S.settings.appKey, backupPass: S.settings.backupPass, server: S.settings.server };
+    COLLECTIONS.forEach(k => { if (o.data[k] !== undefined) S[k] = o.data[k]; });
+    Object.assign(S.settings, keep); save(...COLLECTIONS); closeSheet(); applyTheme(); go('today'); toast('Backup restored');
+  };
+}
+
+/* ---- Server helpers (Netlify Functions on the same site) ---- */
+const apiBase = () => (S.settings.server || '').replace(/\/$/, '');
+async function api(path, opts = {}) {
+  if (!S.settings.appKey) throw new Error('Add your app key first (set as APP_KEY in Netlify).');
+  let res;
+  try { res = await fetch(apiBase() + path, { ...opts, headers: { 'content-type': 'application/json', 'x-app-key': S.settings.appKey, ...(opts.headers || {}) } }); }
+  catch (e) { throw new Error(navigator.onLine ? 'Could not reach the server. Is the site deployed with functions?' : 'You are offline. Try again when connected.'); }
+  let body = null; try { body = await res.json(); } catch (e) { }
+  if (!res.ok) throw new Error(body?.error || `Server error ${res.status}${res.status === 404 ? ': functions not deployed' : ''}`);
+  return body;
+}
+
+/* ---- Encrypted cloud backup ---- */
+const b64 = buf => btoa(String.fromCharCode(...new Uint8Array(buf)));
+const unb64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+async function deriveKey(pass, salt) {
+  const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pass), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: 210000, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+}
+async function encrypt(obj, pass) {
+  const salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, await deriveKey(pass, salt), new TextEncoder().encode(JSON.stringify(obj)));
+  return { v: 1, salt: b64(salt), iv: b64(iv), ct: b64(ct) };
+}
+async function decrypt(p, pass) {
+  const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(p.iv) }, await deriveKey(pass, unb64(p.salt)), unb64(p.ct));
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+async function cloudBackup(silent) {
+  if (!S.settings.backupPass) throw new Error('Set a backup passphrase first.');
+  const payload = await encrypt(snapshot(), S.settings.backupPass);
+  const r = await api('/api/backup', { method: 'PUT', body: JSON.stringify({ payload, meta: { at: nowIso(), version: APP_VERSION } }) });
+  S.sync.lastBackup = r.at || nowIso(); S.sync.lastBackupError = null; save('sync');
+  if (!silent) { toast('Encrypted backup saved'); render(); }
+}
+A.cloudBackup = async el => { el.disabled = true; el.textContent = 'Backing up…'; try { await cloudBackup(); } catch (e) { S.sync.lastBackupError = e.message; save('sync'); toast(e.message); render(); } };
+A.cloudRestore = async el => {
+  el.disabled = true;
+  try { const r = await api('/api/backup?key=latest'); if (!r.payload) throw new Error('No cloud backup found yet.'); const o = await decrypt(r.payload, S.settings.backupPass || ''); confirmRestore(o, 'cloud'); }
+  catch (e) { toast(e.name === 'OperationError' ? 'Wrong passphrase for this backup.' : e.message); el.disabled = false; }
+};
+
+/* ---- Notion sync (one-way, app → Notion) ---- */
+const txt = v => (v ?? '').toString();
+function syncRecords() {
+  const inc = S.settings.notionRoutines;
+  const gName = id => goalOf(id)?.title || '';
+  const out = [];
+  S.goals.forEach(g => out.push({ type: 'goals', appId: g.id, u: [g.updatedAt, ...S.milestones.filter(m => m.goalId === g.id).map(m => m.updatedAt)].filter(Boolean).sort().pop(), name: g.title, props: { Pillar: P[g.pillar]?.short, Status: GOAL_STATUS[g.status]?.[0], Progress: goalProgress(g), 'Target date': g.targetDate, Why: g.why, 'Success criteria': g.criteria, Risks: g.risks, Dependencies: g.deps, Evidence: (g.evidence || []).map(e => `${e.date}: ${e.text}`).join('\n'), Cycle: cycleFor(g.cycle || yearStart()).label } }));
+  S.milestones.forEach(m => out.push({ type: 'milestones', appId: m.id, u: m.updatedAt, name: m.title, props: { Goal: gName(m.goalId), Kind: m.kind === 'quarter' ? 'Quarterly' : 'Monthly', Period: m.kind === 'quarter' ? m.period : fmtMonth(m.period), Due: m.due, Done: !!m.done, 'Done on': m.doneAt ? m.doneAt.slice(0, 10) : null } }));
+  S.tasks.filter(t => inc || t.source !== 'routine').forEach(t => out.push({ type: 'tasks', appId: t.id, u: t.updatedAt, name: t.title, props: { Pillar: P[t.pillar]?.short || 'General', Status: { open: 'Open', done: 'Done', skipped: 'Skipped' }[t.status], Date: t.date, Time: t.time, Minutes: t.dur, Essential: !!t.essential, Goal: gName(t.goalId), Source: { routine: 'Routine', weekly: 'Weekly action', manual: 'Task' }[t.source] || 'Task', 'Skip reason': t.skipReason, Notes: t.notes } }));
+  Object.values(S.journal).filter(hasJournal).forEach(j => out.push({ type: 'journal', appId: 'j-' + j.date, u: j.updatedAt, name: `Journal ${j.date}`, props: { Date: j.date, 'What matters most': j.morning?.matters, Grateful: j.morning?.grateful, 'One action': j.morning?.action, Accomplished: j.evening?.accomplished, Learned: j.evening?.learned, Challenged: j.evening?.challenged, Improve: j.evening?.improve, Notes: j.notes, Leadership: j.leader } }));
+  S.reviews.forEach(r => { const f = facts(r.start, r.end); out.push({ type: 'reviews', appId: r.id, u: r.updatedAt, name: `${r.type[0].toUpperCase() + r.type.slice(1)} review ${r.start}`, props: { Type: r.type, Start: r.start, End: r.end, Facts: `Completion ${f.completion ?? '—'}% (${f.done}/${f.planned}), skipped ${f.skipped}, workouts ${f.workouts}, drills ${f.drills}, CPD ${f.cpdHours}h, journal days ${f.journalDays}, milestones ${f.milestonesDone}, avg sleep ${f.avgSleep ?? '—'}h`, 'Self-assessment': Object.entries(r.self || {}).map(([k, v]) => `${k}: ${v}`).join('\n'), Suggestions: suggestions(f).join('\n') } }); });
+  S.logs.forEach(l => out.push({ type: 'logs', appId: l.id, u: l.updatedAt, name: `${LOG_FIELDS[l.kind]?.title || l.kind} ${l.date}`, props: { Kind: LOG_FIELDS[l.kind]?.title || l.kind, Date: l.date, Minutes: l.mins, Tags: (l.tags || []).join(', '), Rating: l.rating, Note: [l.topic, l.song, l.chords, l.note].filter(Boolean).join(' · ') } }));
+  return out;
+}
+function pendingSync() { const map = S.sync.map; return syncRecords().filter(r => !map[r.appId] || (r.u && r.u > map[r.appId].at)); }
+let syncing = false;
+async function notionSync(silent) {
+  if (syncing) return; syncing = true;
+  const prog = $('#syncProg');
+  try {
+    if (!S.settings.notionPage) throw new Error('Paste the Notion page link where your databases should live.');
+    const items = pendingSync();
+    const archive = S.sync.deleted.filter(d => S.sync.map[d.id]?.notionId).map(d => ({ appId: d.id, notionId: S.sync.map[d.id].notionId }));
+    let ok = 0, failed = 0, lastErr = null;
+    const batches = []; for (let i = 0; i < items.length; i += 4) batches.push(items.slice(i, i + 4));
+    if (!batches.length && archive.length) batches.push([]);
+    for (let bi = 0; bi < batches.length; bi++) {
+      if (prog) prog.textContent = `Syncing ${Math.min((bi + 1) * 4, items.length)} of ${items.length}…`;
+      const b = batches[bi];
+      const r = await api('/api/notion', { method: 'POST', body: JSON.stringify({ action: 'sync', parent: S.settings.notionPage, dbIds: S.sync.dbIds || {}, items: b.map(x => ({ type: x.type, appId: x.appId, notionId: S.sync.map[x.appId]?.notionId, name: x.name, props: x.props })), archive: bi === 0 ? archive : [] }) });
+      S.sync.dbIds = r.dbIds;
+      for (const res of r.results) {
+        const rec = b.find(x => x.appId === res.appId);
+        if (res.ok) { S.sync.map[res.appId] = { notionId: res.notionId, at: rec?.u || nowIso(), type: rec?.type }; ok++; } else { failed++; lastErr = res.error; }
+      }
+      for (const a of (r.archived || [])) { delete S.sync.map[a]; S.sync.deleted = S.sync.deleted.filter(d => d.id !== a); }
+      save('sync');
+    }
+    S.sync.lastNotionAttempt = nowIso();
+    if (failed) { S.sync.notionError = `${failed} records failed: ${lastErr}`; }
+    else { S.sync.lastNotion = nowIso(); S.sync.notionError = null; }
+    S.sync.lastNotionCount = ok; save('sync');
+    if (!silent) toast(failed ? `${ok} synced, ${failed} failed` : ok ? `${ok} records written to Notion` : 'Notion is already up to date');
+  } catch (e) {
+    S.sync.notionError = e.message; S.sync.lastNotionAttempt = nowIso(); save('sync'); if (!silent) toast(e.message);
+  } finally { syncing = false; if (R.sub === 'data') render(); }
+}
+A.notionSync = el => { el.disabled = true; el.textContent = 'Syncing…'; notionSync(); };
+A.notionTest = async el => {
+  el.disabled = true;
+  try { const r = await api('/api/notion', { method: 'POST', body: JSON.stringify({ action: 'test', parent: S.settings.notionPage }) }); toast(`Connected to “${r.title || 'your page'}”`); }
+  catch (e) { toast(e.message); } finally { el.disabled = false; }
+};
+A.notionReset = () => openSheet('Reset Notion link?', `<p class="small">Use this if you deleted the databases in Notion or want to sync into a new page. The next sync creates fresh databases and writes every record again. Nothing in Notion is deleted.</p><button class="btn danger block" data-a="doNotionReset">Reset and resync from scratch</button>`);
+A.doNotionReset = () => { S.sync.map = {}; S.sync.dbIds = {}; S.sync.deleted = []; save('sync'); closeSheet(); render(); toast('Notion link reset'); };
+A.saveConn = () => {
+  Object.assign(S.settings, { server: val('cnServer').trim(), appKey: val('cnKey').trim(), notionPage: val('cnPage').trim(), notionRoutines: val('cnRoutines'), notionAuto: val('cnAuto'), backupAuto: val('cnBackupAuto') });
+  if (val('cnPass')) S.settings.backupPass = val('cnPass');
+  save('settings'); toast('Connection settings saved'); render();
+};
+async function autoJobs() {
+  const s = S.settings; if (!s.appKey || !navigator.onLine) return;
+  const stale = iso => !iso || (Date.now() - new Date(iso).getTime()) > 20 * 3600e3;
+  try { if (s.backupAuto && s.backupPass && stale(S.sync.lastBackup)) await cloudBackup(true); } catch (e) { S.sync.lastBackupError = e.message; save('sync'); }
+  if (s.notionAuto && s.notionPage && stale(S.sync.lastNotionAttempt)) await notionSync(true);
+}
+const when = iso => iso ? new Date(iso).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' }) : 'Never';
+SCREENS.data = () => {
+  const s = S.settings, pend = pendingSync().length, del = S.sync.deleted.length;
+  return { title: 'Backup, export & Notion', html: `<div class="stack">
+  <div class="card stack-sm"><h3>Download a backup</h3><p class="small muted">Works offline with no setup. On iPhone, choose "Save to Files".</p>
+    <button class="btn primary block" data-a="exportJson">${ICON.download} Full backup (.json)</button>
+    <button class="btn block" data-a="exportMd">${ICON.download} Readable export (.md)</button>
+    <div class="chips">${['tasks', 'goals', 'milestones', 'journal', 'logs', 'days'].map(k => `<button class="chip" data-a="exportCsv" data-k="${k}">${k}.csv</button>`).join('')}</div>
+    <label class="btn ghost block" for="impIn">Restore from a .json backup</label><input type="file" id="impIn" accept="application/json,.json" data-onchange="importJson" hidden></div>
+
+  <div class="card stack-sm"><div class="row between"><h3>Notion sync</h3><span class="badge ${S.sync.notionError ? 'bad' : S.sync.lastNotion ? 'ok' : ''}">${S.sync.notionError ? 'Error' : S.sync.lastNotion ? 'Connected' : 'Not set up'}</span></div>
+    <p class="small muted">One-way: the app writes goals, milestones, tasks, journal, reviews and logs into six Notion databases. Each record carries a stable App ID, so syncing again updates it rather than duplicating it.</p>
+    <div class="row between small"><span class="muted">Last successful sync</span><b>${when(S.sync.lastNotion)}</b></div>
+    <div class="row between small"><span class="muted">Waiting to sync</span><b class="num">${pend} changes${del ? ` · ${del} deletions` : ''}</b></div>
+    ${S.sync.notionError ? `<div class="callout" style="border-color:var(--bad)"><b>Last attempt failed.</b> ${esc(S.sync.notionError)}</div>` : ''}
+    <p class="small" id="syncProg" aria-live="polite"></p>
+    <button class="btn primary block" data-a="notionSync" ${!s.appKey || !s.notionPage ? 'disabled' : ''}>${S.sync.notionError ? 'Retry sync' : 'Sync to Notion now'}</button>
+    <div class="row"><button class="btn block sm" data-a="notionTest" ${!s.appKey || !s.notionPage ? 'disabled' : ''}>Test connection</button><button class="btn block sm ghost" data-a="notionReset">Reset link</button></div></div>
+
+  <div class="card stack-sm"><div class="row between"><h3>Encrypted cloud backup</h3><span class="badge ${S.sync.lastBackupError ? 'bad' : S.sync.lastBackup ? 'ok' : ''}">${S.sync.lastBackup ? 'On' : 'Off'}</span></div>
+    <p class="small muted">Encrypted on this phone with your passphrase before upload, then stored with your Netlify site. Restore it onto a new phone with the same passphrase. Nobody can read it without the passphrase, and it cannot be recovered if you forget it.</p>
+    <div class="row between small"><span class="muted">Last backup</span><b>${when(S.sync.lastBackup)}</b></div>
+    ${S.sync.lastBackupError ? `<div class="callout" style="border-color:var(--bad)">${esc(S.sync.lastBackupError)}</div>` : ''}
+    <div class="row"><button class="btn block" data-a="cloudBackup" ${!s.appKey || !s.backupPass ? 'disabled' : ''}>Back up now</button><button class="btn block ghost" data-a="cloudRestore" ${!s.appKey || !s.backupPass ? 'disabled' : ''}>Restore</button></div></div>
+
+  <div class="card stack"><h3>Connection settings</h3>
+    <label class="f">App key (the APP_KEY you set in Netlify)<input type="password" id="cnKey" value="${esc(s.appKey || '')}" autocomplete="off"></label>
+    <label class="f">Notion page link (share it with your integration first)<input type="url" id="cnPage" value="${esc(s.notionPage || '')}" placeholder="https://www.notion.so/…"></label>
+    <label class="f">Backup passphrase ${s.backupPass ? '(set, leave blank to keep)' : ''}<input type="password" id="cnPass" autocomplete="new-password" placeholder="${s.backupPass ? '••••••••' : 'Choose something memorable'}"></label>
+    ${toggleRow('cnRoutines', 'Include routine tasks in Notion', s.notionRoutines, 'Off keeps Notion focused on goal actions and one-off tasks')}
+    ${toggleRow('cnAuto', 'Sync to Notion once a day', s.notionAuto, 'Runs when you open the app, at most once every 20 hours')}
+    ${toggleRow('cnBackupAuto', 'Cloud backup once a day', s.backupAuto, 'Runs when you open the app')}
+    <details><summary>Advanced</summary><label class="f">Server address (leave blank when using the Netlify site)<input type="url" id="cnServer" value="${esc(s.server || '')}" placeholder="https://your-site.netlify.app"></label></details>
+    <button class="btn primary block" data-a="saveConn">Save connection settings</button></div>
+  <p class="tiny faint">Setup steps are in the README that comes with the app.</p></div>` };
+};
+
+/* ===================== Progress analytics (real records only) ===================== */
+let range = 30;
+const SERIES = ['var(--p-pro)', 'var(--p-faith)', 'var(--p-biz)', 'var(--p-comms)', 'var(--p-health)', 'var(--p-skills)'];
+function firstUse() { return (S.settings.createdAt || nowIso()).slice(0, 10); }
+function rangeStart() { const s = addDays(today(), -(range - 1)); return s < firstUse() ? firstUse() : s; }
+function buckets() {
+  const start = addDays(today(), -(range - 1)), out = [];
+  if (range === 7) { for (let d = start; d <= today(); d = addDays(d, 1)) out.push({ label: DOW[dow(d)].slice(0, 2), start: d, end: d }); }
+  else if (range === 365) { for (let i = 11; i >= 0; i--) { const s = addMonths(monthKey(today()) + '-01', -i); out.push({ label: MON[pd(s).getMonth()].slice(0, 3), start: s, end: addDays(addMonths(s, 1), -1) }); } }
+  else { let ws = weekStart(start); while (ws <= today()) { out.push({ label: fmtDate(ws).replace(' ', ' '), start: ws, end: addDays(ws, 6) }); ws = addDays(ws, 7); } }
+  return out.filter(b => b.end >= firstUse()).map(b => { let planned = 0, done = 0; for (let d = b.start < firstUse() ? firstUse() : b.start; d <= b.end && d <= today(); d = addDays(d, 1)) { const s = dayStats(d); planned += s.planned; done += s.done; } return { ...b, planned, done, pct: planned ? Math.round(done / planned * 100) : null }; });
+}
+/* ---- SVG primitives ---- */
+function barSvg(items, { max = 100, unit = '%', h = 150, color = 'var(--gold)' } = {}) {
+  const W = 320, padL = 28, padB = 22, padT = 14, n = items.length, bw = Math.min(28, (W - padL - 8) / n * 0.62), step = (W - padL - 8) / n;
+  const y = v => padT + (h - padT - padB) * (1 - v / max);
+  const grid = [0, max / 2, max].map(v => `<line x1="${padL}" x2="${W}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/><text x="${padL - 6}" y="${y(v) + 3}" text-anchor="end">${Math.round(v)}${unit}</text>`).join('');
+  const bars = items.map((it, i) => { const x = padL + step * i + (step - bw) / 2; const show = n <= 14 || i % Math.ceil(n / 12) === 0;
+    return `${it.value == null ? `<text x="${x + bw / 2}" y="${y(0) - 4}" text-anchor="middle">–</text>` : `<rect x="${x}" y="${y(it.value)}" width="${bw}" height="${Math.max(1, y(0) - y(it.value))}" rx="3" fill="${it.color || color}"><title>${esc(it.label)}: ${it.value}${unit}</title></rect>${n <= 8 ? `<text x="${x + bw / 2}" y="${y(it.value) - 4}" text-anchor="middle" style="fill:var(--ink-2)">${it.value}</text>` : ''}`}
+    ${show ? `<text x="${x + bw / 2}" y="${h - 6}" text-anchor="middle">${esc(it.label)}</text>` : ''}`; }).join('');
+  return `<div class="chart"><svg viewBox="0 0 ${W} ${h}" role="img">${grid}${bars}</svg></div>`;
+}
+function groupedSvg(items, h = 160) {
+  const max = Math.max(4, ...items.map(i => i.planned)); const W = 320, padL = 28, padB = 22, padT = 10, n = items.length, step = (W - padL - 8) / n, bw = Math.min(12, step * 0.34);
+  const y = v => padT + (h - padT - padB) * (1 - v / max);
+  const grid = [0, Math.round(max / 2), max].map(v => `<line x1="${padL}" x2="${W}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${padL - 6}" y="${y(v) + 3}" text-anchor="end">${v}</text>`).join('');
+  return `<div class="chart"><svg viewBox="0 0 ${W} ${h}" role="img">${grid}${items.map((it, i) => { const x = padL + step * i + step / 2; const show = n <= 14 || i % Math.ceil(n / 12) === 0;
+    return `<rect x="${x - bw - 1}" y="${y(it.planned)}" width="${bw}" height="${y(0) - y(it.planned)}" rx="2" fill="var(--line)"><title>${esc(it.label)} planned ${it.planned}</title></rect><rect x="${x + 1}" y="${y(it.done)}" width="${bw}" height="${y(0) - y(it.done)}" rx="2" fill="var(--navy)"><title>${esc(it.label)} done ${it.done}</title></rect>${show ? `<text x="${x}" y="${h - 6}" text-anchor="middle">${esc(it.label)}</text>` : ''}`; }).join('')}</svg></div>
+    <div class="legend"><span><i class="dot" style="background:var(--line)"></i>Planned</span><span><i class="dot" style="background:var(--navy)"></i>Completed</span></div>`;
+}
+function lineSvg(series, labels, { max = 100, min = 0, unit = '', h = 150 } = {}) {
+  const W = 320, padL = 28, padR = 10, padB = 22, padT = 12, n = labels.length;
+  const x = i => padL + (n <= 1 ? (W - padL - padR) / 2 : (W - padL - padR) * i / (n - 1)), y = v => padT + (h - padT - padB) * (1 - (v - min) / (max - min));
+  const grid = [min, (min + max) / 2, max].map(v => `<line x1="${padL}" x2="${W - padR}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${padL - 6}" y="${y(v) + 3}" text-anchor="end">${Math.round(v * 10) / 10}${unit}</text>`).join('');
+  const lines = series.map(s => { const pts = s.values.map((v, i) => v == null ? null : [x(i), y(v)]); const segs = []; let cur = [];
+    pts.forEach(p => { if (p) cur.push(p); else if (cur.length) { segs.push(cur); cur = []; } }); if (cur.length) segs.push(cur);
+    const last = pts.filter(Boolean).pop();
+    return segs.map(sg => `<polyline points="${sg.map(p => p.join(',')).join(' ')}" fill="none" stroke="${s.color}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>`).join('') + pts.filter(Boolean).map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="${p === last ? 3.6 : 2.2}" fill="${s.color}"/>`).join(''); }).join('');
+  const lbl = labels.map((l, i) => (n <= 12 || i % Math.ceil(n / 8) === 0 || i === n - 1) ? `<text x="${x(i)}" y="${h - 6}" text-anchor="middle">${esc(l)}</text>` : '').join('');
+  return `<div class="chart"><svg viewBox="0 0 ${W} ${h}" role="img">${grid}${lines}${lbl}</svg></div>${series.length > 1 ? `<div class="legend">${series.map(s => `<span><i class="dot" style="background:${s.color}"></i>${esc(s.name)}</span>`).join('')}</div>` : ''}`;
+}
+function donutSvg(segs, center) {
+  const total = sum(segs.map(s => s.value)); const r = 52, c = 2 * Math.PI * r; let off = 0;
+  const arcs = segs.filter(s => s.value).map(s => { const len = s.value / total * c; const el = `<circle cx="70" cy="70" r="${r}" fill="none" stroke="${s.color}" stroke-width="20" stroke-dasharray="${Math.max(0, len - 2)} ${c}" stroke-dashoffset="${-off}" transform="rotate(-90 70 70)"><title>${esc(s.label)}: ${s.value}</title></circle>`; off += len; return el; }).join('');
+  return `<div class="row" style="gap:16px;align-items:center"><div class="chart" style="width:140px;flex:none"><svg viewBox="0 0 140 140" role="img"><circle cx="70" cy="70" r="${r}" fill="none" stroke="var(--surface-2)" stroke-width="20"/>${arcs}<text x="70" y="68" text-anchor="middle" style="font-size:20px;fill:var(--navy);font-family:var(--serif)">${center[0]}</text><text x="70" y="86" text-anchor="middle">${center[1]}</text></svg></div>
+  <div class="stack-sm grow small">${segs.map(s => `<div class="row">${`<i class="dot" style="background:${s.color}"></i>`}<span class="grow">${esc(s.label)}</span><b class="num">${s.display ?? s.value}</b></div>`).join('')}</div></div>`;
+}
+const hbar = (label, p, color, right) => `<div class="stack-sm" style="gap:4px"><div class="row between small"><span class="grow" style="min-width:0">${label}</span><b class="num">${right ?? p + '%'}</b></div><div class="bar"><i style="width:${clamp(p, 0, 100)}%;background:${color}"></i></div></div>`;
+const chartCard = (title, what, body, note = '') => `<div class="card chart-card"><div><h3>${title}</h3><p class="what">${what}</p></div>${body}${note ? `<p class="tiny faint">${note}</p>` : ''}</div>`;
+const noData = msg => `<div class="empty"><b>No data yet</b><span>${msg}</span></div>`;
+
+SCREENS.progress = () => {
+  const start = rangeStart(), end = today();
+  const f = facts(start, end), bs = buckets();
+  const hasTasks = bs.some(b => b.planned);
+  // 1 & 6
+  const bucketWord = range === 7 ? 'day' : range === 365 ? 'month' : 'week';
+  const c1 = hasTasks ? barSvg(bs.map(b => ({ label: b.label, value: b.pct }))) : noData('Tick off planned tasks on Today and your completion rate appears here.');
+  const c6 = hasTasks ? groupedSvg(bs) : noData('Planned and completed items are counted from the days you use the app.');
+  // 2 monthly consistency
+  const months = []; for (let i = 11; i >= 0; i--) { const s = addMonths(monthKey(today()) + '-01', -i); if (addDays(addMonths(s, 1), -1) >= firstUse()) months.push(s); }
+  const cons = months.map(s => { let act = 0, elig = 0; for (let d = s < firstUse() ? firstUse() : s; d < addMonths(s, 1) && d <= today(); d = addDays(d, 1)) { if (S.days[d]?.mode === 'rest') continue; elig++; const st = dayStats(d); if (st.done || hasJournal(S.journal[d]) || S.days[d]?.checkin) act++; } return elig ? Math.round(act / elig * 100) : null; });
+  const c2 = cons.some(v => v) ? lineSvg([{ name: 'Active days', color: 'var(--gold)', values: cons }], months.map(m => MON[pd(m).getMonth()])) : noData('Shows the share of non-rest days each month with at least one completed item, check-in or journal entry.');
+  // 3 by pillar
+  const pSegs = PILLARS.map(p => ({ label: p.short, value: f.byPillar[p.id].done, color: p.color, display: `${f.byPillar[p.id].done}/${f.byPillar[p.id].planned}` }));
+  const c3 = f.done ? donutSvg(pSegs, [String(f.done), 'completed']) : noData('Completed items, split by life area.');
+  // 4 quarterly milestones
+  const cs = cycleFor(today() < yearStart() ? yearStart() : today()).start;
+  const qd = [1, 2, 3, 4].map(q => { const ms = S.milestones.filter(m => m.kind === 'quarter' && m.q === q && (goalOf(m.goalId)?.cycle || yearStart()) === cs); return { label: `Q${q} (${ms.filter(m => m.done).length}/${ms.length})`, value: ms.length ? Math.round(ms.filter(m => m.done).length / ms.length * 100) : null }; });
+  const c4 = qd.some(q => q.value != null) ? barSvg(qd, { color: 'var(--navy)' }) : noData('Add quarterly milestones to your goals.');
+  // 5 goals
+  const goals = S.goals.filter(g => (g.cycle || yearStart()) === cs);
+  const c5 = goals.length ? `<div class="stack-sm">${goals.map(g => hbar(`${pillarDot(g.pillar)} ${esc(g.title)}`, goalProgress(g), P[g.pillar].color)).join('')}</div>` : noData('Your annual goals appear here.');
+  // 7 time allocation
+  const logged = S.logs.filter(l => l.date >= start && l.date <= end);
+  const loggedTaskIds = new Set(logged.map(l => l.taskId).filter(Boolean));
+  const tAlloc = PILLARS.map(p => { const rec = sum(logged.filter(l => l.pillar === p.id).map(l => l.mins)); const est = sum(S.tasks.filter(t => t.date >= start && t.date <= end && t.status === 'done' && t.pillar === p.id && !loggedTaskIds.has(t.id) && !(t.kind && logged.some(l => l.date === t.date && l.kind === t.kind))).map(t => t.dur)); return { p, rec, est, total: rec + est }; });
+  const tMax = Math.max(1, ...tAlloc.map(t => t.total));
+  const c7 = tAlloc.some(t => t.total) ? `<div class="stack-sm">${tAlloc.map(t => `<div class="stack-sm" style="gap:4px"><div class="row between small"><span>${pillarDot(t.p.id)} ${esc(t.p.short)}</span><b class="num">${Math.round(t.total / 6) / 10} h</b></div><div class="bar" style="display:flex"><i style="width:${t.rec / tMax * 100}%;background:${t.p.color};border-radius:0"></i><i style="width:${t.est / tMax * 100}%;background:${t.p.color};opacity:.4;border-radius:0"></i></div></div>`).join('')}
+    <div class="legend"><span><i class="dot" style="background:var(--ink-2)"></i>Recorded (activity logs)</span><span><i class="dot" style="background:var(--ink-2);opacity:.4"></i>Estimated (task durations)</span></div></div>` : noData('Comes from your activity logs (recorded) and the planned minutes of completed tasks (estimated).');
+  // 8 finance
+  const c8 = S.finance.targets.length ? `<div class="stack-sm">${S.finance.targets.map(t => hbar(`${esc(t.name)} <span class="faint">${t.kind}</span>`, finProgress(t) ?? 0, 'var(--p-biz)', `${money(finCurrent(t))} / ${money(t.target)}`)).join('')}</div>` : noData('Add your own targets in More → Personal finance.');
+  // 9 competencies
+  const comps = S.competencies.filter(c => c.history.length).sort((a, b) => b.history[b.history.length - 1].date.localeCompare(a.history[a.history.length - 1].date)).slice(0, 6);
+  const cDates = [...new Set(comps.flatMap(c => c.history.map(h => h.date)))].sort();
+  const c9 = comps.length ? lineSvg(comps.map((c, i) => { let lastV = null; return { name: c.name.length > 28 ? c.name.slice(0, 27) + '…' : c.name, color: SERIES[i], values: cDates.map(d => { const h = c.history.find(x => x.date === d); if (h) lastV = h.value; return h ? h.value : null; }) }; }), cDates.map(d => fmtDate(d)), { max: 5, min: 0 }) : noData('Rate your competencies in More → Professional development. Each update adds a point.');
+  // comms self-assessment
+  const wr = S.reviews.filter(r => r.type === 'weekly' && r.self && (r.self.clarity || r.self.confidence || r.self.natural)).sort((a, b) => a.start.localeCompare(b.start)).slice(-12);
+  const cC = wr.length ? lineSvg([['clarity', 'Clarity', 'var(--p-comms)'], ['confidence', 'Confidence', 'var(--gold)'], ['natural', 'Natural conversation', 'var(--p-pro)']].map(([k, n, c]) => ({ name: n, color: c, values: wr.map(r => r.self[k] ?? null) })), wr.map(r => fmtDate(r.start)), { max: 5 }) : noData('Rate clarity, confidence and natural conversation in your weekly review.');
+  // 10 projects
+  const c10 = S.projects.length ? `<div class="stack-sm">${WORKSPACES.map(w => S.projects.filter(p => p.ws === w.id).map(p => { const d = p.milestones.filter(m => m.done).length; return hbar(`<b>${esc(w.name)}</b> · ${esc(p.title)}`, pct(d, p.milestones.length) || 0, 'var(--p-biz)', `${d}/${p.milestones.length}`); }).join('')).join('')}</div>` : noData('Add projects in More → Business & property.');
+  // 11 heatmap
+  const hDays = Math.max(range, 91), hStart = weekStart(addDays(today(), -(hDays - 1)));
+  let cells = ''; let anyHeat = false;
+  for (let d = hStart; d <= addDays(weekStart(today()), 6); d = addDays(d, 1)) {
+    if (d > today() || d < firstUse()) { cells += `<i style="opacity:${d > today() ? 0 : .35}"></i>`; continue; }
+    const st = dayStats(d), rest = S.days[d]?.mode === 'rest', j = hasJournal(S.journal[d]) ? 1 : 0; const score = st.done + j + (S.days[d]?.checkin ? 1 : 0); if (score) anyHeat = true;
+    const lvl = rest ? 'rest' : score === 0 ? 0 : score <= 2 ? 1 : score <= 5 ? 2 : 3;
+    cells += `<i style="background:var(--heat-${lvl})" title="${fmtDate(d, { dow: true })}: ${st.done} done${j ? ', journal' : ''}${rest ? ' (rest day)' : ''}"></i>`;
+  }
+  const c11 = `<div class="chart-wrap"><div class="heat">${cells}</div></div><div class="legend"><span><i class="dot" style="background:var(--heat-0);border-radius:2px"></i>None</span><span><i class="dot" style="background:var(--heat-1);border-radius:2px"></i>Light</span><span><i class="dot" style="background:var(--heat-3);border-radius:2px"></i>Full</span><span><i class="dot" style="background:var(--heat-rest);border-radius:2px"></i>Rest day</span></div>${anyHeat ? '' : '<p class="small faint">Your days fill in here as you use the app.</p>'}`;
+  // 12 month compare
+  const tm = monthKey(today()) + '-01', lm = addMonths(tm, -1);
+  const a = facts(tm, addDays(addMonths(tm, 1), -1)), noPrev = addDays(tm, -1) < firstUse(), b = noPrev ? {} : facts(lm < firstUse() ? firstUse() : lm, addDays(tm, -1));
+  const cmpRows = [['Completion', a.completion != null ? a.completion + '%' : '—', b.completion != null ? b.completion + '%' : '—'], ['Items done', a.done, b.done], ['Active days', a.activeDays, b.activeDays], ['Journal days', a.journalDays, b.journalDays], ['Workouts', a.workouts, b.workouts], ['Comms drills', a.drills, b.drills], ['CPD hours', a.cpdHours, b.cpdHours], ['Milestones', a.milestonesDone, b.milestonesDone]];
+  const c12 = true ? `<div style="overflow-x:auto"><table class="small num" style="width:100%;border-collapse:collapse"><thead><tr><th style="text-align:left;padding:6px 0" class="faint">Measure</th><th style="text-align:right" class="faint">${MON[pd(tm).getMonth()]} (so far)</th><th style="text-align:right" class="faint">${MON[pd(lm).getMonth()]}</th></tr></thead><tbody>${cmpRows.map(r => `<tr style="border-top:1px solid var(--line)"><td style="padding:7px 0">${r[0]}</td><td style="text-align:right"><b>${r[1]}</b></td><td style="text-align:right">${noPrev ? '<span class="faint">—</span>' : r[2] ?? '—'}</td></tr>`).join('')}</tbody></table></div>` : noData('Available once you have used the app across two months.');
+
+  const html = `<div class="stack">
+    <div class="seg">${[[7, '7 days'], [30, '30 days'], [90, '90 days'], [365, '12 months']].map(([v, l]) => `<button data-a="range" data-v="${v}" aria-pressed="${range === v}">${l}</button>`).join('')}</div>
+    <p class="tiny faint">Since ${fmtDate(start, { year: true })}. Only what you have recorded is shown. Rest days and items skipped on purpose are excluded from rates.</p>
+    <div class="kpis"><div class="kpi"><b>${f.completion != null ? f.completion + '%' : '—'}</b><span>Completion</span></div><div class="kpi"><b>${f.activeDays}</b><span>Active days</span></div><div class="kpi"><b>${f.milestonesDone}</b><span>Milestones</span></div></div>
+    ${chartCard('Completion rate', `Completed ÷ planned items per ${bucketWord}, excluding skips. “–” means nothing was planned.`, c1)}
+    ${chartCard('Planned vs completed', `Number of items planned and completed per ${bucketWord}.`, c6)}
+    ${chartCard('Daily engagement', 'Each square is a day. Darker means more completed items, check-ins and journal entries.', c11)}
+    ${chartCard('By life area', 'Completed items in each area for this period (done / planned).', c3, 'Faith and marriage items count as kept rhythms, not as a measure of spiritual life.')}
+    ${chartCard('Time allocation', 'Hours by area. Solid is recorded in activity logs, faded is estimated from completed tasks\' planned minutes.', c7)}
+    ${chartCard('Monthly consistency', 'Share of non-rest days each month with at least one completed item, check-in or journal entry.', c2)}
+    ${chartCard('Month comparison', 'This month so far against last month, from saved records.', c12)}
+    ${chartCard('Quarterly milestones', 'Share of each quarter\'s milestones achieved, current year. Not affected by the date filter.', c4)}
+    ${chartCard('Annual goal progress', 'From milestones and objectives achieved, or your own estimate where you chose self-assessed.', c5)}
+    ${chartCard('Business projects', 'Project milestones completed in each workspace.', c10)}
+    ${chartCard('Financial targets', 'Latest balance you entered against each target.', c8)}
+    ${chartCard('Competency confidence', 'Your self-rated confidence (1–5) over time, for the six most recently updated competencies.', c9)}
+    ${chartCard('Communication self-assessment', 'Weekly self-ratings (1–5) from your weekly reviews.', cC)}
+  </div>`;
+  return { title: 'Progress', html };
+};
+A.range = el => { range = Number(el.dataset.v); render(); };
+
+/* ===================== PIN lock ===================== */
+async function hashPin(pin, salt) { const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(salt + ':' + pin)); return b64(d); }
+function showLock() {
+  return new Promise(resolve => {
+    let entry = '', fails = 0;
+    const el = document.createElement('div'); el.className = 'lock'; el.id = 'lock';
+    const draw = (msg = '') => { el.innerHTML = `<div class="wordmark">One Life OS</div><h2>Enter your PIN</h2><div class="pin-dots">${[0, 1, 2, 3].map(i => `<i class="${i < entry.length ? 'f' : ''}"></i>`).join('')}</div><p class="small" style="color:var(--bad);min-height:1.2em">${msg}</p>
+      <div class="keypad">${[1, 2, 3, 4, 5, 6, 7, 8, 9, '', 0, '⌫'].map(k => k === '' ? '<span></span>' : `<button data-k="${k}" aria-label="${k === '⌫' ? 'Delete' : k}">${k}</button>`).join('')}</div>
+      <p class="tiny faint" style="max-width:280px;text-align:center">Forgot it? Data stays locked on this device. You can reinstall and restore from a backup.</p>`; };
+    draw(); document.body.appendChild(el);
+    el.addEventListener('click', async e => {
+      const b = e.target.closest('[data-k]'); if (!b) return; const k = b.dataset.k;
+      if (k === '⌫') entry = entry.slice(0, -1); else if (entry.length < 4) entry += k;
+      draw();
+      if (entry.length === 4) {
+        if (await hashPin(entry, S.settings.pinSalt) === S.settings.pinHash) { el.remove(); resolve(); }
+        else { fails++; entry = ''; draw(fails >= 5 ? 'Too many attempts. Wait 30 seconds.' : 'Incorrect PIN'); if (fails >= 5) { el.style.pointerEvents = 'none'; setTimeout(() => { el.style.pointerEvents = ''; fails = 0; draw(); }, 30000); } }
+      }
+    });
+  });
+}
+A.setPin = () => openSheet('Set a 4-digit PIN', `<input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" id="pin1" placeholder="New PIN"><input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" id="pin2" placeholder="Repeat PIN"><button class="btn primary block" data-a="savePin">Save PIN</button>`);
+A.savePin = async () => {
+  const a = val('pin1'), b = val('pin2'); if (!/^\d{4}$/.test(a)) return toast('Use exactly 4 digits'); if (a !== b) return toast('PINs do not match');
+  S.settings.pinSalt = uid(); S.settings.pinHash = await hashPin(a, S.settings.pinSalt); save('settings'); closeSheet(); if ($('#view')) render(); toast('PIN set');
+};
+A.removePin = () => { delete S.settings.pinHash; delete S.settings.pinSalt; save('settings'); if ($('#view')) render(); toast('PIN removed'); };
+
+/* ===================== Onboarding (under 5 minutes) ===================== */
+const OB = { step: 0, o: { name: 'Paul', wifeName: '', officeDays: [2, 4], workStart: '09:00', workEnd: '17:00', commute: 45, wake: '06:00', bedtime: '22:30', bibleDay: 1, bibleTime: '19:30', churchTime: '10:00', dateNight: 5, yearStart: '2026-10-14' }, goals: STARTER_GOALS.filter(g => g.on).map(g => g.key) };
+function obRead() {
+  const o = OB.o; const g = id => document.getElementById(id);
+  if (g('obName')) { o.name = g('obName').value; o.wifeName = g('obWife').value; }
+  if (g('obWs')) { o.workStart = g('obWs').value; o.workEnd = g('obWe').value; o.commute = g('obCommute').value; o.officeDays = $$('#obOffice [aria-pressed="true"]').map(b => Number(b.dataset.d)); }
+  if (g('obWake')) { o.wake = g('obWake').value; o.bedtime = g('obBed').value; o.bibleDay = g('obBibleDay').value; o.bibleTime = g('obBibleTime').value; o.churchTime = g('obChurch').value; o.dateNight = g('obDate').value; }
+  if (g('obGoals')) OB.goals = $$('#obGoals input:checked').map(c => c.dataset.k);
+}
+function renderOnboarding() {
+  const o = OB.o, s = OB.step;
+  const daySel = (id, v, days = [0, 1, 2, 3, 4, 5, 6]) => `<select id="${id}">${days.map(d => `<option value="${d}" ${Number(v) === d ? 'selected' : ''}>${DOWL[d]}</option>`).join('')}</select>`;
+  const steps = [
+    `<h1>Welcome to ONE LIFE OS</h1><p class="muted">Vision to daily action, in one calm place. Setup takes about three minutes, and you can change everything later.</p>
+     <label class="f">Your name<input type="text" id="obName" value="${esc(o.name)}"></label><label class="f">Your wife's name (optional, used for reminders)<input type="text" id="obWife" value="${esc(o.wifeName)}"></label>`,
+    `<h1>Your working week</h1><p class="muted">The planner keeps growth tasks out of working hours.</p>
+     <label class="f">Usual office days</label><div class="chips" id="obOffice">${[1, 2, 3, 4, 5].map(d => `<button class="chip" data-a="lgChip" data-d="${d}" aria-pressed="${o.officeDays.includes(d)}">${DOW[d]}</button>`).join('')}</div>
+     <div class="field-row"><label class="f">Work starts<input type="time" id="obWs" value="${o.workStart}"></label><label class="f">Work ends<input type="time" id="obWe" value="${o.workEnd}"></label></div>
+     <label class="f">Commute each way on office days (minutes)<input type="number" inputmode="numeric" id="obCommute" value="${o.commute}"></label>`,
+    `<h1>Your rhythm</h1><p class="muted">These become protected commitments.</p>
+     <div class="field-row"><label class="f">Wake<input type="time" id="obWake" value="${o.wake}"></label><label class="f">Bedtime target<input type="time" id="obBed" value="${o.bedtime}"></label></div>
+     <div class="field-row"><label class="f">Bible study day${daySel('obBibleDay', o.bibleDay)}</label><label class="f">Starts<input type="time" id="obBibleTime" value="${o.bibleTime}"></label></div>
+     <label class="f">Sunday church (keyboard) starts<input type="time" id="obChurch" value="${o.churchTime}"></label>
+     <label class="f">Date night${daySel('obDate', o.dateNight)}</label>`,
+    `<h1>Starter goals</h1><p class="muted">Sensible starting points for ${cycleFor(yearStart()).label}, each with quarterly milestones. Nothing is marked as achieved. Untick anything that doesn't fit and edit the rest later.</p>
+     <div class="stack-sm" id="obGoals">${PILLARS.map(p => `<span class="eyebrow">${esc(p.name)}</span><div class="list">${STARTER_GOALS.filter(g => g.pillar === p.id).map(g => `<label class="task"><input type="checkbox" class="switch" data-k="${g.key}" ${OB.goals.includes(g.key) ? 'checked' : ''}><span class="grow small">${esc(g.title)}</span></label>`).join('')}</div>`).join('')}</div>`,
+    `<h1>Privacy and data</h1>
+     <div class="callout">Everything is saved on this phone as you go. You can download backups any time, and turn on encrypted cloud backup and Notion sync in More.</div>
+     <div class="callout">This is a personal app. Don't enter DVS case details, client information or government documents. Keep learning notes general.</div>
+     <button class="btn block" data-a="setPin">${ICON.lock} Set a PIN (optional)</button>`,
+  ];
+  document.body.innerHTML = `<div id="app" class="ob"><div class="stack"><div class="wordmark">One Life OS</div><div class="steps">${steps.map((_, i) => `<i class="${i <= s ? 'on' : ''}"></i>`).join('')}</div>${steps[s]}
+    <div class="row" style="margin-top:8px">${s ? '<button class="btn block" data-a="obBack">Back</button>' : ''}<button class="btn primary block" data-a="obNext">${s === steps.length - 1 ? 'Start my plan' : 'Continue'}</button></div></div></div>`;
+}
+A.obNext = () => { obRead(); if (OB.step < 4) { OB.step++; renderOnboarding(); scrollTo(0, 0); return; } finishOnboarding(); };
+A.obBack = () => { obRead(); OB.step--; renderOnboarding(); };
+async function finishOnboarding() {
+  seedFromOnboarding(OB.o, OB.goals);
+  try { navigator.storage && navigator.storage.persist && await navigator.storage.persist(); } catch (e) { }
+  await flush();
+  startApp();
+  toast('Your plan is ready');
+}
+
+/* ===================== Boot ===================== */
+function startApp() {
+  shell(); applyTheme(); R.date = null; go('today');
+  setTimeout(autoJobs, 2500);
+}
+async function boot() {
+  await loadAll();
+  applyTheme();
+  if (memoryOnly) document.title = 'ONE LIFE OS (not saving)';
+  if (!S.settings.onboarded) { renderOnboarding(); return; }
+  if (S.settings.pinHash) { document.body.innerHTML = ''; await showLock(); }
+  startApp();
+  if (memoryOnly) toast('Storage is blocked in this browser, so changes will not be saved.');
+}
+let lastDay = today();
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && S.settings.onboarded && $('#view')) {
+    if (today() !== lastDay) { lastDay = today(); if (!R.sub) { R.date = null; render(); } }
+  }
+});
+if ('serviceWorker' in navigator && location.protocol === 'https:') {
+  navigator.serviceWorker.register('sw.js').then(reg => {
+    reg.addEventListener('updatefound', () => { const w = reg.installing; w && w.addEventListener('statechange', () => { if (w.state === 'installed' && navigator.serviceWorker.controller) { toast('Update ready. Reopen the app to use it.'); } }); });
+  }).catch(() => { });
+}
+boot();
+
+</script>
+</body>
+</html>

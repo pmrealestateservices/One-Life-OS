@@ -1,0 +1,9 @@
+{
+  "name": "one-life-os",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "ONE LIFE OS: personal growth, performance and life management PWA",
+  "scripts": { "build": "python3 build.py" },
+  "dependencies": { "@netlify/blobs": "^10.7.13" }
+}
